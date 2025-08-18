@@ -16,8 +16,35 @@
   .no-data{opacity:0.7;text-align:center;padding:18px;color:var(--text-muted);}
   #login-container { text-align: center; padding-top: 20vh;}
   #adminLoginBtn { background: #4285F4; color: white; border: none; padding: 12px 24px; font-size: 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
-  .btn { padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer; color: white; font-size: 0.8rem; margin: 2px; }
-  .btn-green { background: var(--green); } .btn-red { background: var(--red); } .btn-blue { background: var(--blue); } .btn-dark-red { background: #991b1b; } .btn-purple { background: var(--purple); }
+
+  /* --- DÜYMƏ STİLLƏRİ YENİLƏNDİ --- */
+  .btn { 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    border: 1px solid var(--border-color); 
+    cursor: pointer; 
+    color: var(--text-main); 
+    font-size: 0.8rem; 
+    font-weight: 500;
+    margin: 2px; 
+    background-color: #1f2937; /* Default background */
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+  }
+  .btn:hover {
+    filter: brightness(1.2);
+  }
+  .btn-green { background-color: #15803d; border-color: #16a34a; }
+  .btn-green:hover { background-color: #16a34a; }
+  .btn-red { background-color: #b91c1c; border-color: #dc2626; }
+  .btn-red:hover { background-color: #dc2626; }
+  .btn-blue { background-color: #1d4ed8; border-color: #2563eb; }
+  .btn-blue:hover { background-color: #2563eb; }
+  .btn-dark-red { background: #7f1d1d; border-color: #991b1b; }
+  .btn-dark-red:hover { background-color: #991b1b; }
+  .btn-purple { background: #4338ca; border-color: #4f46e5; }
+  .btn-purple:hover { background-color: #4f46e5; }
+  /* --- DÜYMƏ STİLLƏRİNİN SONU --- */
+
   .status { font-weight: bold; padding: 4px 8px; border-radius: 6px; color: white; }
   .status-pending { background-color: var(--yellow); } .status-approved { background-color: var(--green); } .status-rejected { background-color: var(--red); }
   .actions-cell { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
@@ -48,10 +75,10 @@
   .past-announcement-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; }
   .past-announcement-item p { margin: 0; white-space: pre-wrap; word-break: break-word; }
   .past-announcement-item .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
-  .form-grid { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-  .form-grid .full-width { grid-column: 1 / -1; }
-  .form-grid label { font-size: 0.9rem; margin-bottom: 5px; display: block; color: var(--text-muted); }
-  .form-grid input, .form-grid select, .form-grid textarea { width: 100%; box-sizing: border-box; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: var(--text-main); font-size: 1rem; padding: 8px; }
+  #statusForm { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  #statusForm .full-width { grid-column: 1 / -1; }
+  #statusForm label { font-size: 0.9rem; margin-bottom: 5px; display: block; color: var(--text-muted); }
+  #statusForm input, #statusForm select, #statusForm textarea { width: 100%; box-sizing: border-box; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: var(--text-main); font-size: 1rem; padding: 8px; }
   .form-buttons { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
   .status-indicator-admin { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
   .indicator-active { background-color: var(--green); } .indicator-delayed { background-color: var(--yellow); } .indicator-paused { background-color: var(--red); }
@@ -63,13 +90,9 @@
   .status-display.idle { background: #4b5563; }
   .status-display.pending { background: var(--yellow); color: var(--bg-main); }
   .status-display.active { background: var(--green); }
-  
-  /* --- YENİ: VIRTUAL BİRJA STILLƏRİ --- */
-  .price-input { width: 80px; padding: 4px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: var(--text-main); }
-
   @media screen and (max-width: 768px) {
     body { padding: 10px; }
-    #support-center, .form-grid { flex-direction: column; display: flex; }
+    #support-center, #statusForm { flex-direction: column; display: flex; }
     #chat-list-container { flex-basis: 200px; }
     table, thead, tbody, th, td, tr { display: block; }
     thead tr { position: absolute; top: -9999px; left: -9999px; }
@@ -78,8 +101,8 @@
     td:last-child { border-bottom: 0; }
     td:before { content: attr(data-label); position: absolute; left: 10px; width: 45%; padding-right: 10px; white-space: nowrap; text-align: left; font-weight: bold; opacity: 0.8; }
     .actions-cell { flex-direction: column; align-items: stretch; padding: 10px; gap: 8px; }
-    .balance-input, .price-input, .btn { width: 100%; box-sizing: border-box; padding: 8px; margin: 0; }
-    .form-grid { grid-template-columns: 1fr; }
+    .balance-input, .btn { width: 100%; box-sizing: border-box; padding: 8px; margin: 0; }
+    #statusForm { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -95,34 +118,6 @@
         <div class="stat-card"><div class="stat-value" id="stat-pending-amount">0.00</div><div class="stat-label">Gözləyən Məbləğ (AZN)</div></div>
         <div class="stat-card"><div class="stat-value" id="stat-unread-msgs">0</div><div class="stat-label">Oxunmamış Mesaj</div></div>
       </div>
-      
-      <div class="section">
-        <h2 style="margin:0;">Virtual Birja İdarəetməsi</h2>
-        <table id="sharesManagementTable">
-            <thead><tr><th>ID</th><th>Ad</th><th>Qiymət (AZN)</th><th>Əməliyyatlar</th></tr></thead>
-            <tbody><tr class="no-data-row"><td colspan="4" class="no-data">Səhm yoxdur.</td></tr></tbody>
-        </table>
-        <form id="shareForm" class="form-grid">
-            <input type="hidden" id="shareKey">
-            <div>
-                <label for="shareId">Səhm ID (məs: TECHPRO)</label>
-                <input type="text" id="shareId" required placeholder="Böyük hərflə, boşluqsuz">
-            </div>
-            <div>
-                <label for="shareName">Səhm Adı (məs: TechPro Inc.)</label>
-                <input type="text" id="shareName" required>
-            </div>
-            <div>
-                <label for="sharePrice">Qiymət</label>
-                <input type="number" step="0.01" id="sharePrice" required placeholder="məs: 12.50">
-            </div>
-            <div class="form-buttons" style="align-self: end;">
-                <button type="button" class="btn btn-red" id="cancelShareUpdate" style="display: none;">Ləğv et</button>
-                <button type="submit" class="btn btn-green" id="saveShareBtn">Yeni Səhm Əlavə Et</button>
-            </div>
-        </form>
-      </div>
-      
       <div class="section">
         <h2 style="margin:0;">Para Yağışı İdarəetməsi</h2>
         <div id="moneyRainControls">
@@ -142,13 +137,13 @@
             <button id="stopMoneyRainBtn" class="btn btn-red">Dayandır</button>
         </div>
       </div>
-      <div class="section">
+            <div class="section">
         <h2 style="margin:0;">Sistem Vəziyyətini İdarə Et</h2>
         <table id="statusManagementTable">
             <thead><tr><th>Sıra</th><th>Başlıq</th><th>Açıqlama</th><th>Vəziyyət</th><th>Əməliyyatlar</th></tr></thead>
             <tbody><tr class="no-data-row"><td colspan="5" class="no-data">Status yoxdur.</td></tr></tbody>
         </table>
-        <form id="statusForm" class="form-grid">
+        <form id="statusForm">
             <input type="hidden" id="statusKey">
             <div class="full-width">
                 <label for="statusLabel">Başlıq</label>
@@ -182,7 +177,7 @@
         <button id="sendAnnouncementBtn" class="btn btn-purple">Elanı Göndər</button>
         <div id="past-announcements-list"></div>
       </div>
-      <div class="section">
+            <div class="section">
         <h2 style="margin:0;">Dəstək Mərkəzi</h2>
         <div id="support-center">
             <div id="chat-list-container"></div>
@@ -205,7 +200,7 @@
             <tbody><tr class="no-data-row"><td colspan="7" class="no-data">Heç bir sorğu yoxdur.</td></tr></tbody>
         </table>
       </div>
-      <div class="section">
+            <div class="section">
           <h2 style="margin:0;">İstifadəçilər & Balans</h2>
           <input type="search" id="userSearchInput" placeholder="Ada və ya emailə görə axtar...">
           <table id="userTable">
@@ -232,7 +227,6 @@
     };
     function loadAllData() {
         loadDashboardStats();
-        loadInvestmentShares(); // YENİ FUNKSIYANIN YÜKLƏNMƏSİ
         loadSystemStatuses();
         loadAnnouncements();
         loadSupportChats();
@@ -293,7 +287,7 @@
     }
     function loadUsersAndBalances() { const usersRef = db.ref('users'); const balancesRef = db.ref('balances'); usersRef.on('value', (userSnapshot) => { balancesRef.on('value', (balanceSnapshot) => { masterUserList = []; if (!userSnapshot.exists()) { displayUsers([]); return; } const allBalances = balanceSnapshot.val() || {}; userSnapshot.forEach(childSnapshot => { const uid = childSnapshot.key; const userData = childSnapshot.val(); const userBalance = allBalances[uid] && allBalances[uid].amount ? allBalances[uid].amount : 0; masterUserList.push({ uid: uid, displayName: userData.displayName, email: userData.email, balance: userBalance }); }); document.getElementById('userSearchInput').dispatchEvent(new Event('input')); }); }); }
     document.getElementById('userSearchInput').addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase(); if (!searchTerm) { displayUsers(masterUserList); return; } const filteredList = masterUserList.filter(user => { const name = user.displayName ? user.displayName.toLowerCase() : ''; const email = user.email ? user.email.toLowerCase() : ''; return name.includes(searchTerm) || email.includes(searchTerm); }); displayUsers(filteredList); });
-      function loadSystemStatuses() {
+        function loadSystemStatuses() {
         const tableBody = document.getElementById('statusManagementTable').querySelector('tbody');
         const statusRef = db.ref('system_status');
         statusRef.on('value', (snapshot) => {
@@ -369,114 +363,6 @@
         }).catch(error => alert("Xəta: " + error.message));
     });
     document.getElementById('cancelStatusUpdate').addEventListener('click', resetStatusForm);
-      /* === YENİ: VIRTUAL BİRJA İDARƏETMƏSİ === */
-    function loadInvestmentShares() {
-        const tableBody = document.getElementById('sharesManagementTable').querySelector('tbody');
-        const sharesRef = db.ref('investments/shares');
-        sharesRef.on('value', (snapshot) => {
-            tableBody.innerHTML = '';
-            if (!snapshot.exists()) {
-                tableBody.innerHTML = '<tr class="no-data-row"><td colspan="4" class="no-data">Səhm yoxdur.</td></tr>';
-                return;
-            }
-            snapshot.forEach(child => {
-                const key = child.key;
-                const data = child.val();
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td data-label="ID"><b>${key}</b></td>
-                    <td data-label="Ad">${data.name}</td>
-                    <td data-label="Qiymət (AZN)">
-                        <div class="actions-cell">
-                           <input type="number" step="0.01" class="price-input" id="price-input-${key}" value="${parseFloat(data.price).toFixed(2)}">
-                           <button class="btn btn-blue" onclick="updateSharePrice('${key}')">Yenilə</button>
-                        </div>
-                    </td>
-                    <td data-label="Əməliyyatlar">
-                        <div class="actions-cell">
-                            <button class="btn btn-blue" onclick='editShare("${key}", ${JSON.stringify(JSON.stringify(data))})'>Redaktə et</button>
-                            <button class="btn btn-red" onclick="deleteShare('${key}')">Sil</button>
-                        </div>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        });
-    }
-
-    function updateSharePrice(key) {
-        const priceInput = document.getElementById(`price-input-${key}`);
-        const newPrice = parseFloat(priceInput.value);
-        if(isNaN(newPrice) || newPrice < 0) {
-            return alert("Zəhmət olmasa, düzgün qiymət daxil edin.");
-        }
-        db.ref(`investments/shares/${key}`).update({ price: newPrice })
-            .then(() => alert(`'${key}' səhminin qiyməti uğurla yeniləndi.`))
-            .catch(error => alert("Xəta: " + error.message));
-    }
-
-    function resetShareForm() {
-        const form = document.getElementById('shareForm');
-        form.reset();
-        document.getElementById('shareKey').value = '';
-        document.getElementById('shareId').disabled = false;
-        document.getElementById('saveShareBtn').textContent = 'Yeni Səhm Əlavə Et';
-        document.getElementById('cancelShareUpdate').style.display = 'none';
-    }
-
-    function editShare(key, jsonData) {
-        const data = JSON.parse(jsonData);
-        document.getElementById('shareKey').value = key;
-        document.getElementById('shareId').value = key;
-        document.getElementById('shareId').disabled = true; // Səhm ID-sini dəyişməyə icazə vermirik
-        document.getElementById('shareName').value = data.name;
-        document.getElementById('sharePrice').value = data.price;
-        document.getElementById('saveShareBtn').textContent = 'Yenilə';
-        document.getElementById('cancelShareUpdate').style.display = 'inline-block';
-        window.scrollTo(0, document.getElementById('shareForm').offsetTop);
-    }
-
-    function deleteShare(key) {
-        if (confirm(`'${key}' səhmini silmək istədiyinizə əminsiniz? Bu əməliyyat istifadəçilərin portfelinə təsir edə bilər.`)) {
-            db.ref('investments/shares/' + key).remove()
-                .then(() => alert("Səhm uğurla silindi."))
-                .catch(error => alert("Xəta: " + error.message));
-        }
-    }
-
-    document.getElementById('shareForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const key = document.getElementById('shareKey').value;
-        const shareId = document.getElementById('shareId').value.trim().toUpperCase();
-        
-        if (!shareId || !/^[A-Z0-9]+$/.test(shareId)) {
-            alert("Səhm ID yalnız böyük hərflərdən və rəqəmlərdən ibarət olmalıdır, boşluq ola bilməz.");
-            return;
-        }
-
-        const shareData = {
-            name: document.getElementById('shareName').value,
-            price: parseFloat(document.getElementById('sharePrice').value)
-        };
-
-        if (isNaN(shareData.price) || shareData.price < 0) {
-            alert("Zəhmət olmasa, düzgün qiymət daxil edin.");
-            return;
-        }
-
-        let promise;
-        if (key) { // Redaktə rejimi
-            promise = db.ref('investments/shares/' + key).update(shareData);
-        } else { // Yeni əlavə etmə rejimi
-            promise = db.ref('investments/shares/' + shareId).set(shareData);
-        }
-        promise.then(() => {
-            alert(key ? "Səhm uğurla yeniləndi." : "Yeni səhm uğurla əlavə edildi.");
-            resetShareForm();
-        }).catch(error => alert("Xəta: " + error.message));
-    });
-    document.getElementById('cancelShareUpdate').addEventListener('click', resetShareForm);
-
 
     /* === PARA YAĞIŞI İDARƏETMƏSİ === */
     function initializeMoneyRainPanel() {
@@ -548,6 +434,7 @@
             .then(() => alert("Para Yağışı uğurla dayandırıldı."))
             .catch(error => alert("Xəta: " + error.message));
     }
+    // DƏYİŞİKLİK: Nəticə hesablanarkən tarixçəyə qeyd əlavə edilir
     function calculateResultsFromAdmin(eventData) {
         const participants = eventData.participants || {};
         const totalAmount = eventData.totalAmount;
@@ -566,7 +453,9 @@
             const finalReward = parseFloat(reward.toFixed(2));
             if (finalReward > 0) {
                 leaderboard[uid] = { displayName: participant.displayName, score: participant.score, reward: finalReward };
+                // Balansı yenilə
                 allUpdates[`/balances/${uid}/amount`] = firebase.database.ServerValue.increment(finalReward);
+                // Tarixçə üçün yeni qeyd yarat
                 const newDepositKey = db.ref('deposits').push().key;
                 allUpdates[`/deposits/${newDepositKey}`] = {
                     uid: uid,
