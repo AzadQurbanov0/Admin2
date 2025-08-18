@@ -214,8 +214,8 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
     <a class="nav-item" id="leaderboardBtn"><span>🏅</span>Liderlər</a>
     <a class="nav-item" id="statsBtn"><span>📊</span>Statistika</a>
     <a class="nav-item" id="helpBtn"><span>❓</span>Kömək</a>
-      </footer>
-      <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+</footer>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
 <script>
@@ -303,22 +303,40 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
         modal.style.display = 'flex';
     }
     
-    // YENİ FUNKSİYALAR
+    // YENİ və DƏYİŞDİRİLMİŞ FUNKSİYALAR
     function switchPage(pageId) {
+        const actionButtons = document.querySelector('.action-buttons');
+
+        // Bütün səhifələri gizlət və menyu düymələrindəki aktiv stili sil
         document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        
-        if (pageId === 'leaderboard-page') {
-            document.getElementById('leaderboardBtn').classList.add('active');
-            fetchLeaderboard();
-        } else if (pageId === 'stats-page') {
-            document.getElementById('statsBtn').classList.add('active');
-            fetchStatistics();
-        } else if (pageId === 'help-page') {
-            document.getElementById('helpBtn').classList.add('active');
+
+        // Hədəf səhifəni göstər
+        document.getElementById(pageId).classList.add('active');
+
+        // Hansı səhifədə olduğumuza görə düymələri göstər/gizlə
+        if (pageId === 'main-page') {
+            actionButtons.style.display = 'block'; // Əsas səhifədə düymələr görünsün
         } else {
-            document.getElementById('homeBtn').classList.add('active');
+            actionButtons.style.display = 'none'; // Digər səhifələrdə gizlənsin
+        }
+
+        // Aktiv menyu düyməsini təyin et və lazımi məlumatı yüklə
+        switch (pageId) {
+            case 'main-page':
+                document.getElementById('homeBtn').classList.add('active');
+                break;
+            case 'leaderboard-page':
+                document.getElementById('leaderboardBtn').classList.add('active');
+                fetchLeaderboard();
+                break;
+            case 'stats-page':
+                document.getElementById('statsBtn').classList.add('active');
+                fetchStatistics();
+                break;
+            case 'help-page':
+                document.getElementById('helpBtn').classList.add('active');
+                break;
         }
     }
 
