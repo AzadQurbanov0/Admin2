@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Panel</title>
+<style>
+  :root { --bg-main: #0f1724; --bg-section: #0b1220; --border-color: #1f2937; --text-main: #e6eef8; --text-muted: #9fb3d9; --green: #16a34a; --red: #dc2626; --blue: #2563eb; --yellow: #f59e0b; --purple: #4f46e5; }
+  body{margin:0;padding:20px;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg-main);color:var(--text-main); display: flex; align-items: center; justify-content: center; min-height: 100vh;}
+  .container{max-width:1300px;margin:0 auto; width: 100%;}
+  h1,h2{margin:0 0 12px 0; text-align: center;}
+  .section{background:var(--bg-section);border:1px solid var(--border-color);border-radius:10px;padding:12px;margin-bottom:16px;}
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{padding:8px 10px;border:1px solid rgba(255,255,255,0.06);text-align:center;font-size:14px; word-break: break-word; vertical-align: middle;}
+  th{background:rgba(255,255,255,0.03);}
+  .no-data{opacity:0.7;text-align:center;padding:18px;color:var(--text-muted);}
+  #login-container { text-align: center; padding-top: 20vh;}
+  #adminLoginBtn { background: #4285F4; color: white; border: none; padding: 12px 24px; font-size: 1.1rem; border-radius: 8px; cursor: pointer; font-weight: 600; }
+  .btn { padding: 5px 10px; border-radius: 6px; border: none; cursor: pointer; color: white; font-size: 0.8rem; margin: 2px; }
+  .btn-green { background: var(--green); } .btn-red { background: var(--red); } .btn-blue { background: var(--blue); } .btn-dark-red { background: #991b1b; } .btn-purple { background: var(--purple); }
+  .status { font-weight: bold; padding: 4px 8px; border-radius: 6px; color: white; }
+  .status-pending { background-color: var(--yellow); } .status-approved { background-color: var(--green); } .status-rejected { background-color: var(--red); }
+  .actions-cell { display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+  .balance-input { width: 80px; padding: 4px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: var(--text-main); }
+  #support-center { display: flex; gap: 16px; min-height: 60vh; max-height: 70vh; }
+  #chat-list-container { flex: 0 0 300px; background: rgba(0,0,0,0.1); border-radius: 8px; overflow-y: auto; padding: 8px; }
+  .chat-list-item { padding: 12px; border-radius: 6px; cursor: pointer; margin-bottom: 6px; border: 1px solid transparent; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center; }
+  .chat-list-item:hover { background: rgba(255,255,255,0.05); border-color: var(--border-color); }
+  .chat-list-item.active { background: var(--blue); color: white; }
+  .new-message-indicator { width: 10px; height: 10px; background-color: var(--green); border-radius: 50%; }
+  #chat-view-container { flex-grow: 1; border-radius: 8px; background: rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; }
+  #chat-view-header { padding: 12px; background: rgba(0,0,0,0.2); font-weight: bold; text-align: center; border-bottom: 1px solid var(--border-color); }
+  #messages-container { flex-grow: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
+  .message { max-width: 70%; padding: 8px 12px; border-radius: 10px; line-height: 1.4; word-break: break-word; }
+  .message.user { background: #374151; color: white; align-self: flex-start; }
+  .message.admin { background: var(--purple); color: white; align-self: flex-end; }
+  #reply-area { display: flex; padding: 10px; border-top: 1px solid var(--border-color); }
+  #reply-input { flex-grow: 1; background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 8px; color: white; }
+  #send-reply-btn { background: var(--purple); color: white; border: none; padding: 0 16px; border-radius: 6px; margin-left: 8px; cursor: pointer; font-weight: bold; }
+  #chat-placeholder { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); }
+  #userSearchInput { width: 100%; padding: 8px 12px; margin-bottom: 12px; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: var(--text-main); font-size: 1rem; box-sizing: border-box; }
+  #dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
+  .stat-card { background: var(--bg-section); border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-value { font-size: 2rem; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+  .stat-label { font-size: 0.9rem; color: var(--text-muted); }
+  #announcement-textarea { width: 100%; box-sizing: border-box; background: #1e293b; border: 1px solid #334155; color: var(--text-main); padding: 10px; border-radius: 6px; min-height: 80px; margin-bottom: 10px; }
+  #past-announcements-list { max-height: 200px; overflow-y: auto; margin-top: 12px; }
+  .past-announcement-item { background: rgba(255,255,255,0.03); padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .past-announcement-item p { margin: 0; white-space: pre-wrap; word-break: break-word; }
+  .past-announcement-item .meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 6px; }
+  .form-grid { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-color); display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  .form-grid .full-width { grid-column: 1 / -1; }
+  .form-grid label { font-size: 0.9rem; margin-bottom: 5px; display: block; color: var(--text-muted); }
+  .form-grid input, .form-grid select, .form-grid textarea { width: 100%; box-sizing: border-box; background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: var(--text-main); font-size: 1rem; padding: 8px; }
+  .form-buttons { grid-column: 1 / -1; display: flex; gap: 10px; justify-content: flex-end; }
+  .status-indicator-admin { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+  .indicator-active { background-color: var(--green); } .indicator-delayed { background-color: var(--yellow); } .indicator-paused { background-color: var(--red); }
+  #moneyRainControls { display: flex; align-items: center; justify-content: space-between; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+  .rain-input-group { display: flex; flex-direction: column; gap: 5px; }
+  .rain-input-group label { font-size: 0.85rem; color: var(--text-muted); }
+  .rain-input-group input { background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; color: var(--text-main); font-size: 1rem; padding: 8px; max-width: 120px; }
+  .status-display { padding: 8px 12px; border-radius: 6px; font-weight: bold; text-align: center; }
+  .status-display.idle { background: #4b5563; }
+  .status-display.pending { background: var(--yellow); color: var(--bg-main); }
+  .status-display.active { background: var(--green); }
+  
+  /* --- YENİ: VIRTUAL BİRJA STILLƏRİ --- */
+  .price-input { width: 80px; padding: 4px; border-radius: 4px; border: 1px solid #334155; background: #1e293b; color: var(--text-main); }
+
+  @media screen and (max-width: 768px) {
+    body { padding: 10px; }
+    #support-center, .form-grid { flex-direction: column; display: flex; }
+    #chat-list-container { flex-basis: 200px; }
+    table, thead, tbody, th, td, tr { display: block; }
+    thead tr { position: absolute; top: -9999px; left: -9999px; }
+    tr { margin-bottom: 15px; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; }
+    td { border: none; border-bottom: 1px solid rgba(255,255,255,0.06); position: relative; padding-left: 50%; text-align: right; min-height: 30px; display: flex; align-items: center; justify-content: flex-end; }
+    td:last-child { border-bottom: 0; }
+    td:before { content: attr(data-label); position: absolute; left: 10px; width: 45%; padding-right: 10px; white-space: nowrap; text-align: left; font-weight: bold; opacity: 0.8; }
+    .actions-cell { flex-direction: column; align-items: stretch; padding: 10px; gap: 8px; }
+    .balance-input, .price-input, .btn { width: 100%; box-sizing: border-box; padding: 8px; margin: 0; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+    <div id="login-container" style="display: none;"><h1>Admin Panel</h1><button id="adminLoginBtn">Google ilə Daxil Ol</button></div>
+    <div id="main-content" style="display: block;">
+      <h1 id="admin-welcome"></h1>
+      <div id="dashboard-grid" class="section">
+        <div class="stat-card"><div class="stat-value" id="stat-total-users">0</div><div class="stat-label">Ümumi İstifadəçi</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-total-balance">0.00</div><div class="stat-label">Sistemdəki Balans (AZN)</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-pending-reqs">0</div><div class="stat-label">Gözləyən Sorğu</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-pending-amount">0.00</div><div class="stat-label">Gözləyən Məbləğ (AZN)</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-unread-msgs">0</div><div class="stat-label">Oxunmamış Mesaj</div></div>
+      </div>
+      
+      <div class="section">
+        <h2 style="margin:0;">Virtual Birja İdarəetməsi</h2>
+        <table id="sharesManagementTable">
+            <thead><tr><th>ID</th><th>Ad</th><th>Qiymət (AZN)</th><th>Əməliyyatlar</th></tr></thead>
+            <tbody><tr class="no-data-row"><td colspan="4" class="no-data">Səhm yoxdur.</td></tr></tbody>
+        </table>
+        <form id="shareForm" class="form-grid">
+            <input type="hidden" id="shareKey">
+            <div>
+                <label for="shareId">Səhm ID (məs: TECHPRO)</label>
+                <input type="text" id="shareId" required placeholder="Böyük hərflə, boşluqsuz">
+            </div>
+            <div>
+                <label for="shareName">Səhm Adı (məs: TechPro Inc.)</label>
+                <input type="text" id="shareName" required>
+            </div>
+            <div>
+                <label for="sharePrice">Qiymət</label>
+                <input type="number" step="0.01" id="sharePrice" required placeholder="məs: 12.50">
+            </div>
+            <div class="form-buttons" style="align-self: end;">
+                <button type="button" class="btn btn-red" id="cancelShareUpdate" style="display: none;">Ləğv et</button>
+                <button type="submit" class="btn btn-green" id="saveShareBtn">Yeni Səhm Əlavə Et</button>
+            </div>
+        </form>
+      </div>
+      
+      <div class="section">
+        <h2 style="margin:0;">Para Yağışı İdarəetməsi</h2>
+        <div id="moneyRainControls">
+            <div class="rain-input-group">
+                <label for="moneyRainAmount">Paylanacaq Məbləğ (AZN)</label>
+                <input type="number" id="moneyRainAmount" placeholder="Məs: 1.50" value="1">
+            </div>
+            <div class="rain-input-group">
+                <label for="moneyRainDuration">Oyun Müddəti (san)</label>
+                <input type="number" id="moneyRainDuration" placeholder="Məs: 30" value="30">
+            </div>
+            <div class="rain-input-group">
+                <label>Vəziyyət</label>
+                <div id="moneyRainStatus" class="status-display idle">Boş</div>
+            </div>
+            <button id="startMoneyRainBtn" class="btn btn-green">Yağışı Başlat</button>
+            <button id="stopMoneyRainBtn" class="btn btn-red">Dayandır</button>
+        </div>
+      </div>
+      <div class="section">
+        <h2 style="margin:0;">Sistem Vəziyyətini İdarə Et</h2>
+        <table id="statusManagementTable">
+            <thead><tr><th>Sıra</th><th>Başlıq</th><th>Açıqlama</th><th>Vəziyyət</th><th>Əməliyyatlar</th></tr></thead>
+            <tbody><tr class="no-data-row"><td colspan="5" class="no-data">Status yoxdur.</td></tr></tbody>
+        </table>
+        <form id="statusForm" class="form-grid">
+            <input type="hidden" id="statusKey">
+            <div class="full-width">
+                <label for="statusLabel">Başlıq</label>
+                <input type="text" id="statusLabel" required>
+            </div>
+            <div class="full-width">
+                <label for="statusText">Açıqlama</label>
+                <textarea id="statusText" rows="2" required></textarea>
+            </div>
+            <div>
+                <label for="statusOrder">Sıra</label>
+                <input type="number" id="statusOrder" value="1" required>
+            </div>
+            <div>
+                <label for="statusState">Vəziyyət</label>
+                <select id="statusState" required>
+                    <option value="active">Aktiv (Yaşıl)</option>
+                    <option value="delayed">Gecikmə (Narıncı)</option>
+                    <option value="paused">Dayandırılıb (Qırmızı)</option>
+                </select>
+            </div>
+            <div class="form-buttons">
+                <button type="button" class="btn btn-red" id="cancelStatusUpdate" style="display: none;">Ləğv et</button>
+                <button type="submit" class="btn btn-green" id="saveStatusBtn">Yeni Status Əlavə Et</button>
+            </div>
+        </form>
+      </div>
+      <div class="section">
+        <h2 style="margin:0;">Ümumi Elan Göndər</h2>
+        <textarea id="announcement-textarea" placeholder="Bütün istifadəçilərə göndəriləcək mesajı bura yazın..."></textarea>
+        <button id="sendAnnouncementBtn" class="btn btn-purple">Elanı Göndər</button>
+        <div id="past-announcements-list"></div>
+      </div>
+      <div class="section">
+        <h2 style="margin:0;">Dəstək Mərkəzi</h2>
+        <div id="support-center">
+            <div id="chat-list-container"></div>
+            <div id="chat-view-container">
+                <div id="chat-placeholder">Söhbətə baxmaq üçün siyahıdan bir istifadəçi seçin</div>
+                <div id="chat-view" style="display:none; height:100%; flex-direction:column; display:flex;">
+                    <div id="chat-view-header"></div>
+                    <div id="messages-container"></div>
+                    <div id="reply-area">
+                        <input type="text" id="reply-input" placeholder="Cavabınızı yazın..."><button id="send-reply-btn">Göndər</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="section">
+        <h2 style="margin:0;">Pul Çıxarma Sorğuları</h2>
+        <table id="withdrawalsTable">
+            <thead><tr><th>Email</th><th>Ad/Soyad</th><th>Kart</th><th>Məbləğ</th><th>Tarix</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+            <tbody><tr class="no-data-row"><td colspan="7" class="no-data">Heç bir sorğu yoxdur.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="section">
+          <h2 style="margin:0;">İstifadəçilər & Balans</h2>
+          <input type="search" id="userSearchInput" placeholder="Ada və ya emailə görə axtar...">
+          <table id="userTable">
+              <thead><tr><th>Ad</th><th>Email</th><th>Balans (AZN)</th><th>Əməliyyatlar</th></tr></thead>
+                <tbody><tr class="no-data-row"><td colspan="4" class="no-data">İstifadəçi yoxdur.</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw", authDomain: "niceuc-e5986.firebaseapp.com", databaseURL: "https://niceuc-e5986-default-rtdb.firebaseio.com", projectId: "niceuc-e5986", appId: "1:242221260650:web:d140153a2167c4738dcf13" };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    let currentChatUid = null;
+    let messagesListener = null;
+    let masterUserList = [];
+    window.onload = function() {
+        document.getElementById('admin-welcome').textContent = `Xoş gəldiniz, Admin`;
+        loadAllData();
+    };
+    function loadAllData() {
+        loadDashboardStats();
+        loadInvestmentShares(); // YENİ FUNKSIYANIN YÜKLƏNMƏSİ
+        loadSystemStatuses();
+        loadAnnouncements();
+        loadSupportChats();
+        loadWithdrawals();
+        loadUsersAndBalances();
+        initializeMoneyRainPanel();
+    }
+    document.getElementById('sendAnnouncementBtn').addEventListener('click', sendAnnouncement);
+    function sendAnnouncement() {
+        const textArea = document.getElementById('announcement-textarea');
+        const text = textArea.value.trim();
+        if (!text) { alert("Elan mətni boş ola bilməz."); return; }
+        const announcementData = { text: text, senderName: "Admin", createdAt: firebase.database.ServerValue.TIMESTAMP };
+        db.ref('announcements').push(announcementData)
+            .then(() => { alert("Elan bütün istifadəçilərə uğurla göndərildi."); textArea.value = ''; })
+            .catch(error => { alert("Elan göndərilərkən xəta baş verdi: " + error.message); });
+    }
+    function loadAnnouncements() {
+        const listContainer = document.getElementById('past-announcements-list');
+        db.ref('announcements').orderByChild('createdAt').limitToLast(10).on('value', snapshot => {
+            listContainer.innerHTML = '';
+            if(!snapshot.exists()) { listContainer.innerHTML = '<p class="no-data">Hələ heç bir elan göndərilməyib.</p>'; return; }
+            let announcements = [];
+            snapshot.forEach(child => { announcements.push({key: child.key, ...child.val()}); });
+            announcements.reverse().forEach(ann => {
+                const item = document.createElement('div');
+                item.className = 'past-announcement-item';
+                item.innerHTML = `<div><p>${ann.text}</p><div class="meta">${ann.senderName} - ${new Date(ann.createdAt).toLocaleString()}</div></div><button class="btn btn-dark-red" onclick="deleteAnnouncement('${ann.key}')">Sil</button>`;
+                listContainer.appendChild(item);
+            });
+        });
+    }
+    function deleteAnnouncement(key) { if(confirm("Bu elanı silmək istədiyinizə əminsiniz?")){ db.ref('announcements/' + key).remove(); } }
+    function loadDashboardStats() {
+        db.ref('users').on('value', snapshot => { document.getElementById('stat-total-users').textContent = snapshot.exists() ? snapshot.numChildren() : 0; });
+        db.ref('balances').on('value', snapshot => { let totalBalance = 0; if (snapshot.exists()) { snapshot.forEach(child => { totalBalance += child.val().amount || 0; }); } document.getElementById('stat-total-balance').textContent = totalBalance.toFixed(2); });
+        db.ref('withdrawals').on('value', snapshot => { let pendingCount = 0; let pendingAmount = 0; if (snapshot.exists()) { snapshot.forEach(child => { const req = child.val(); if (req.status === 'pending' && !req.isArchived) { pendingCount++; pendingAmount += req.requestData.amount || 0; } }); } document.getElementById('stat-pending-reqs').textContent = pendingCount; document.getElementById('stat-pending-amount').textContent = pendingAmount.toFixed(2); });
+        db.ref('support_chats').on('value', snapshot => { let unreadCount = 0; if (snapshot.exists()) { snapshot.forEach(child => { if (child.val().new_message_for_admin) { unreadCount++; } }); } document.getElementById('stat-unread-msgs').textContent = unreadCount; });
+    }
+    function addBalanceAndCreateHistory(userId, amountToAdd) { const amount = parseFloat(amountToAdd); if (!userId || isNaN(amount) || amount <= 0) { return Promise.reject(new Error("Düzgün məbləğ daxil edilməyib.")); } const newDepositKey = db.ref('deposits').push().key; const updates = {}; updates['/deposits/' + newDepositKey] = { uid: userId, amount: amount, createdAt: firebase.database.ServerValue.TIMESTAMP }; updates['/balances/' + userId + '/amount'] = firebase.database.ServerValue.increment(amount); return db.ref().update(updates); }
+    async function updateRequestStatus(key, newStatus) { if (!confirm(`Bu sorğunu "${newStatus === 'approved' ? 'Onayla' : 'Rədd et'}" statusuna dəyişmək istəyirsiniz?`)) return; if (newStatus === 'approved') { db.ref('withdrawals/' + key).update({ status: newStatus }).then(() => alert("Sorğu təsdiqləndi.")).catch(error => alert("Xəta: " + error.message)); } else if (newStatus === 'rejected') { const withdrawalRef = db.ref('withdrawals/' + key); try { const snapshot = await withdrawalRef.once('value'); const requestData = snapshot.val(); if (!requestData || requestData.status !== 'pending') { alert("Bu sorğu artıq emal edilib və ya tapılmadı."); withdrawalRef.update({ status: newStatus }); return; } const amountToRefund = requestData.requestData.amount; const userId = requestData.uid; await db.ref('balances/' + userId + '/amount').set(firebase.database.ServerValue.increment(amountToRefund)); await withdrawalRef.update({ status: newStatus }); alert(`Sorğu rədd edildi və ${amountToRefund.toFixed(2)} AZN istifadəçinin balansına geri qaytarıldı.`); } catch (error) { alert("Sorğu rədd edilərkən xəta baş verdi: " + error.message); } } }
+    function loadSupportChats() { const chatListContainer = document.getElementById('chat-list-container'); const chatRef = db.ref('support_chats').orderByChild('last_updated'); chatRef.on('value', snapshot => { chatListContainer.innerHTML = ''; if (!snapshot.exists()) { chatListContainer.innerHTML = '<p class="no-data">Heç bir söhbət yoxdur.</p>'; return; } let chats = []; snapshot.forEach(child => { chats.push({ uid: child.key, ...child.val() }); }); chats.reverse().forEach(chatData => { const item = document.createElement('div'); item.className = 'chat-list-item'; if (chatData.uid === currentChatUid) { item.classList.add('active'); } item.innerHTML = `<span>${chatData.user_email || 'Naməlum'}</span> ${chatData.new_message_for_admin ? '<div class="new-message-indicator"></div>' : ''}`; item.onclick = () => openChat(chatData.uid, chatData.user_email); chatListContainer.appendChild(item); }); }); document.getElementById('send-reply-btn').onclick = sendAdminReply; document.getElementById('reply-input').onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAdminReply(); } }; }
+    function openChat(uid, userEmail) { currentChatUid = uid; document.querySelectorAll('.chat-list-item').forEach(el => el.classList.remove('active')); const activeItem = [...document.querySelectorAll('.chat-list-item')].find(el => el.textContent.includes(userEmail)); if (activeItem) activeItem.classList.add('active'); document.getElementById('chat-placeholder').style.display = 'none'; document.getElementById('chat-view').style.display = 'flex'; document.getElementById('chat-view-header').textContent = `Söhbət: ${userEmail}`; const messagesContainer = document.getElementById('messages-container'); messagesContainer.innerHTML = ''; if (messagesListener) { messagesListener.off(); } db.ref(`support_chats/${uid}`).update({ new_message_for_admin: false }); const messagesRef = db.ref(`support_chats/${uid}/messages`).limitToLast(100); messagesListener = messagesRef.on('child_added', msgSnapshot => { const msg = msgSnapshot.val(); const msgDiv = document.createElement('div'); msgDiv.className = `message ${msg.sender === 'admin' ? 'admin' : 'user'}`; msgDiv.textContent = msg.text; messagesContainer.appendChild(msgDiv); messagesContainer.scrollTop = messagesContainer.scrollHeight; }); }
+    function sendAdminReply() { const input = document.getElementById('reply-input'); const text = input.value.trim(); if (text === '' || !currentChatUid) return; const messageData = { text: text, sender: 'admin', timestamp: firebase.database.ServerValue.TIMESTAMP }; db.ref(`support_chats/${currentChatUid}/messages`).push(messageData); db.ref(`support_chats/${currentChatUid}`).update({ last_message: text, last_updated: firebase.database.ServerValue.TIMESTAMP, new_message_for_admin: false, new_message_for_user_count: firebase.database.ServerValue.increment(1) }); input.value = ''; }
+    function archiveRequest(key) { if (confirm("Bu sorğunu arxivləşdirmək istəyirsiniz?")) { db.ref('withdrawals/' + key).update({ isArchived: true }); } }
+    function deleteUser(uid, email) { if(confirm(`'${email}' istifadəçisini sil? Bu əməliyyat geri qaytarılmazdır.`)) { db.ref('users/' + uid).remove(); db.ref('balances/' + uid).remove(); }}
+    async function applyBalanceChange(uid) { const inputElement = document.getElementById(`balance-input-${uid}`); const inputValue = inputElement.value.trim().replace(',', '.'); if (inputValue === '') return alert("Zəhmət olmasa, bir dəyər daxil edin."); const changeValue = parseFloat(inputValue); if (isNaN(changeValue)) return alert("Zəhmət olmasa, düzgün rəqəm daxil edin."); try { const balanceSnapshot = await db.ref('balances/' + uid).once('value'); const currentBalance = balanceSnapshot.exists() && balanceSnapshot.val().amount ? parseFloat(balanceSnapshot.val().amount) : 0; let amountAdded = 0; let finalBalance = 0; if (inputValue.startsWith('+')) { amountAdded = changeValue; finalBalance = currentBalance + amountAdded; } else if (inputValue.startsWith('-')) { finalBalance = currentBalance + changeValue; if (finalBalance < 0) finalBalance = 0; if (confirm(`İstifadəçinin balansını ${finalBalance.toFixed(2)} AZN olaraq təyin etmək istəyirsiniz? (Tarixçəyə yazılmayacaq)`)) { await db.ref('balances/' + uid).set({ amount: finalBalance }); alert("Balans uğurla yeniləndi!"); inputElement.value = ''; } return; } else { finalBalance = changeValue; amountAdded = finalBalance - currentBalance; } if (amountAdded > 0) { if (confirm(`İstifadəçinin balansına ${amountAdded.toFixed(2)} AZN əlavə edilsin?\nYeni balans: ${finalBalance.toFixed(2)} AZN`)) { await addBalanceAndCreateHistory(uid, amountAdded); alert("Balans uğurla artırıldı və tarixçəyə qeyd edildi!"); inputElement.value = ''; } } else { if (confirm(`İstifadəçinin balansını ${finalBalance.toFixed(2)} AZN olaraq təyin etmək istəyirsiniz? (Tarixçəyə yazılmayacaq)`)) { await db.ref('balances/' + uid).set({ amount: finalBalance }); alert("Balans uğurla yeniləndi!"); inputElement.value = ''; } } } catch (error) { alert("Balans yenilənərkən xəta baş verdi: " + error.message); } }
+    function loadWithdrawals() { const withdrawalsTableBody = document.getElementById('withdrawalsTable').querySelector('tbody'); db.ref('withdrawals').on('value', (snapshot) => { if (!snapshot.exists()) { withdrawalsTableBody.innerHTML = '<tr class="no-data-row"><td colspan="7" class="no-data">Heç bir sorğu yoxdur.</td></tr>'; return; } withdrawalsTableBody.innerHTML = ''; let requests = []; snapshot.forEach(child => { requests.push({ key: child.key, ...child.val() }); }); const visibleRequests = requests.filter(req => !req.isArchived); visibleRequests.sort((a, b) => { const a_is_pending = a.status === 'pending'; const b_is_pending = b.status === 'pending'; if (a_is_pending && !b_is_pending) return -1; if (!a_is_pending && b_is_pending) return 1; return b.createdAt - a.createdAt; }); if (visibleRequests.length === 0) { withdrawalsTableBody.innerHTML = '<tr class="no-data-row"><td colspan="7" class="no-data">Göstəriləcək aktiv sorğu yoxdur.</td></tr>'; return; } visibleRequests.forEach(data => { const reqData = data.requestData; const tr = document.createElement('tr'); let statusText, statusClass; switch (data.status) { case 'approved': statusText = 'Onaylandı'; statusClass = 'status-approved'; break; case 'rejected': statusText = 'Rədd edildi'; statusClass = 'status-rejected'; break; default: statusText = 'Gözləmədə'; statusClass = 'status-pending'; } let actionButtons; if (data.status === 'pending') { actionButtons = `<button class="btn btn-green" onclick="updateRequestStatus('${data.key}', 'approved')">Onayla</button><button class="btn btn-red" onclick="updateRequestStatus('${data.key}', 'rejected')">Rədd et</button>`; } else { actionButtons = `<button class="btn btn-dark-red" onclick="archiveRequest('${data.key}')">Arxivlə</button>`; } tr.innerHTML = `<td data-label="Email">${data.userEmail}</td><td data-label="Ad/Soyad">${reqData.name} ${reqData.surname}</td><td data-label="Kart">${reqData.cardNumber}</td><td data-label="Məbləğ"><b>${parseFloat(reqData.amount).toFixed(2)} AZN</b></td><td data-label="Tarix">${new Date(data.createdAt).toLocaleString()}</td><td data-label="Status"><span class="status ${statusClass}">${statusText}</span></td><td data-label="Əməliyyat"><div class="actions-cell">${actionButtons}</div></td>`; withdrawalsTableBody.appendChild(tr); }); }); }
+    function displayUsers(userList) {
+        const userTableBody = document.getElementById('userTable').querySelector('tbody');
+        userTableBody.innerHTML = '';
+        if (userList.length === 0) { userTableBody.innerHTML = '<tr class="no-data-row"><td colspan="4" class="no-data">İstifadəçi tapılmadı.</td></tr>'; return; }
+        userList.forEach(userData => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td data-label="Ad">${userData.displayName || 'Adsız'}</td><td data-label="Email">${userData.email}</td><td data-label="Balans (AZN)"><b>${parseFloat(userData.balance).toFixed(2)} AZN</b></td><td data-label="Əməliyyatlar"><div class="actions-cell"><input type="text" id="balance-input-${userData.uid}" placeholder="+50, -20, 200" class="balance-input"><button class="btn btn-blue" onclick="applyBalanceChange('${userData.uid}')">Tətbiq et</button><button class="btn btn-dark-red" onclick="deleteUser('${userData.uid}', '${userData.email}')">Sil</button></div></td>`;
+            userTableBody.appendChild(tr);
+        });
+    }
+    function loadUsersAndBalances() { const usersRef = db.ref('users'); const balancesRef = db.ref('balances'); usersRef.on('value', (userSnapshot) => { balancesRef.on('value', (balanceSnapshot) => { masterUserList = []; if (!userSnapshot.exists()) { displayUsers([]); return; } const allBalances = balanceSnapshot.val() || {}; userSnapshot.forEach(childSnapshot => { const uid = childSnapshot.key; const userData = childSnapshot.val(); const userBalance = allBalances[uid] && allBalances[uid].amount ? allBalances[uid].amount : 0; masterUserList.push({ uid: uid, displayName: userData.displayName, email: userData.email, balance: userBalance }); }); document.getElementById('userSearchInput').dispatchEvent(new Event('input')); }); }); }
+    document.getElementById('userSearchInput').addEventListener('input', (e) => { const searchTerm = e.target.value.toLowerCase(); if (!searchTerm) { displayUsers(masterUserList); return; } const filteredList = masterUserList.filter(user => { const name = user.displayName ? user.displayName.toLowerCase() : ''; const email = user.email ? user.email.toLowerCase() : ''; return name.includes(searchTerm) || email.includes(searchTerm); }); displayUsers(filteredList); });
+      function loadSystemStatuses() {
+        const tableBody = document.getElementById('statusManagementTable').querySelector('tbody');
+        const statusRef = db.ref('system_status');
+        statusRef.on('value', (snapshot) => {
+            tableBody.innerHTML = '';
+            if (!snapshot.exists()) {
+                tableBody.innerHTML = '<tr class="no-data-row"><td colspan="5" class="no-data">Status yoxdur.</td></tr>';
+                return;
+            }
+            let statuses = [];
+            snapshot.forEach(child => { statuses.push({ key: child.key, ...child.val() }); });
+            statuses.sort((a, b) => a.order - b.order);
+            statuses.forEach(data => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="Sıra">${data.order}</td>
+                    <td data-label="Başlıq">${data.label}</td>
+                    <td data-label="Açıqlama">${data.status_text}</td>
+                    <td data-label="Vəziyyət"><span class="status-indicator-admin indicator-${data.state}"></span> ${data.state}</td>
+                    <td data-label="Əməliyyatlar">
+                        <div class="actions-cell">
+                            <button class="btn btn-blue" onclick='editStatus("${data.key}", ${JSON.stringify(JSON.stringify(data))})'>Redaktə et</button>
+                            <button class="btn btn-red" onclick="deleteStatus('${data.key}')">Sil</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        });
+    }
+    function resetStatusForm() {
+        const form = document.getElementById('statusForm');
+        form.reset();
+        document.getElementById('statusKey').value = '';
+        document.getElementById('saveStatusBtn').textContent = 'Yeni Status Əlavə Et';
+        document.getElementById('cancelStatusUpdate').style.display = 'none';
+    }
+    function editStatus(key, jsonData) {
+        const data = JSON.parse(jsonData);
+        document.getElementById('statusKey').value = key;
+        document.getElementById('statusLabel').value = data.label;
+        document.getElementById('statusText').value = data.status_text;
+        document.getElementById('statusOrder').value = data.order;
+        document.getElementById('statusState').value = data.state;
+        document.getElementById('saveStatusBtn').textContent = 'Yenilə';
+        document.getElementById('cancelStatusUpdate').style.display = 'inline-block';
+        window.scrollTo(0, document.getElementById('statusForm').offsetTop);
+    }
+    function deleteStatus(key) {
+        if (confirm("Bu statusu silmək istədiyinizə əminsiniz?")) {
+            db.ref('system_status/' + key).remove()
+                .then(() => alert("Status uğurla silindi."))
+                .catch(error => alert("Xəta: " + error.message));
+        }
+    }
+    document.getElementById('statusForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const key = document.getElementById('statusKey').value;
+        const statusData = {
+            label: document.getElementById('statusLabel').value,
+            status_text: document.getElementById('statusText').value,
+            order: parseInt(document.getElementById('statusOrder').value),
+            state: document.getElementById('statusState').value
+        };
+        let promise;
+        if (key) {
+            promise = db.ref('system_status/' + key).update(statusData);
+        } else {
+            promise = db.ref('system_status').push(statusData);
+        }
+        promise.then(() => {
+            alert(key ? "Status uğurla yeniləndi." : "Yeni status uğurla əlavə edildi.");
+            resetStatusForm();
+        }).catch(error => alert("Xəta: " + error.message));
+    });
+    document.getElementById('cancelStatusUpdate').addEventListener('click', resetStatusForm);
+      /* === YENİ: VIRTUAL BİRJA İDARƏETMƏSİ === */
+    function loadInvestmentShares() {
+        const tableBody = document.getElementById('sharesManagementTable').querySelector('tbody');
+        const sharesRef = db.ref('investments/shares');
+        sharesRef.on('value', (snapshot) => {
+            tableBody.innerHTML = '';
+            if (!snapshot.exists()) {
+                tableBody.innerHTML = '<tr class="no-data-row"><td colspan="4" class="no-data">Səhm yoxdur.</td></tr>';
+                return;
+            }
+            snapshot.forEach(child => {
+                const key = child.key;
+                const data = child.val();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td data-label="ID"><b>${key}</b></td>
+                    <td data-label="Ad">${data.name}</td>
+                    <td data-label="Qiymət (AZN)">
+                        <div class="actions-cell">
+                           <input type="number" step="0.01" class="price-input" id="price-input-${key}" value="${parseFloat(data.price).toFixed(2)}">
+                           <button class="btn btn-blue" onclick="updateSharePrice('${key}')">Yenilə</button>
+                        </div>
+                    </td>
+                    <td data-label="Əməliyyatlar">
+                        <div class="actions-cell">
+                            <button class="btn btn-blue" onclick='editShare("${key}", ${JSON.stringify(JSON.stringify(data))})'>Redaktə et</button>
+                            <button class="btn btn-red" onclick="deleteShare('${key}')">Sil</button>
+                        </div>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        });
+    }
+
+    function updateSharePrice(key) {
+        const priceInput = document.getElementById(`price-input-${key}`);
+        const newPrice = parseFloat(priceInput.value);
+        if(isNaN(newPrice) || newPrice < 0) {
+            return alert("Zəhmət olmasa, düzgün qiymət daxil edin.");
+        }
+        db.ref(`investments/shares/${key}`).update({ price: newPrice })
+            .then(() => alert(`'${key}' səhminin qiyməti uğurla yeniləndi.`))
+            .catch(error => alert("Xəta: " + error.message));
+    }
+
+    function resetShareForm() {
+        const form = document.getElementById('shareForm');
+        form.reset();
+        document.getElementById('shareKey').value = '';
+        document.getElementById('shareId').disabled = false;
+        document.getElementById('saveShareBtn').textContent = 'Yeni Səhm Əlavə Et';
+        document.getElementById('cancelShareUpdate').style.display = 'none';
+    }
+
+    function editShare(key, jsonData) {
+        const data = JSON.parse(jsonData);
+        document.getElementById('shareKey').value = key;
+        document.getElementById('shareId').value = key;
+        document.getElementById('shareId').disabled = true; // Səhm ID-sini dəyişməyə icazə vermirik
+        document.getElementById('shareName').value = data.name;
+        document.getElementById('sharePrice').value = data.price;
+        document.getElementById('saveShareBtn').textContent = 'Yenilə';
+        document.getElementById('cancelShareUpdate').style.display = 'inline-block';
+        window.scrollTo(0, document.getElementById('shareForm').offsetTop);
+    }
+
+    function deleteShare(key) {
+        if (confirm(`'${key}' səhmini silmək istədiyinizə əminsiniz? Bu əməliyyat istifadəçilərin portfelinə təsir edə bilər.`)) {
+            db.ref('investments/shares/' + key).remove()
+                .then(() => alert("Səhm uğurla silindi."))
+                .catch(error => alert("Xəta: " + error.message));
+        }
+    }
+
+    document.getElementById('shareForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const key = document.getElementById('shareKey').value;
+        const shareId = document.getElementById('shareId').value.trim().toUpperCase();
+        
+        if (!shareId || !/^[A-Z0-9]+$/.test(shareId)) {
+            alert("Səhm ID yalnız böyük hərflərdən və rəqəmlərdən ibarət olmalıdır, boşluq ola bilməz.");
+            return;
+        }
+
+        const shareData = {
+            name: document.getElementById('shareName').value,
+            price: parseFloat(document.getElementById('sharePrice').value)
+        };
+
+        if (isNaN(shareData.price) || shareData.price < 0) {
+            alert("Zəhmət olmasa, düzgün qiymət daxil edin.");
+            return;
+        }
+
+        let promise;
+        if (key) { // Redaktə rejimi
+            promise = db.ref('investments/shares/' + key).update(shareData);
+        } else { // Yeni əlavə etmə rejimi
+            promise = db.ref('investments/shares/' + shareId).set(shareData);
+        }
+        promise.then(() => {
+            alert(key ? "Səhm uğurla yeniləndi." : "Yeni səhm uğurla əlavə edildi.");
+            resetShareForm();
+        }).catch(error => alert("Xəta: " + error.message));
+    });
+    document.getElementById('cancelShareUpdate').addEventListener('click', resetShareForm);
+
+
+    /* === PARA YAĞIŞI İDARƏETMƏSİ === */
+    function initializeMoneyRainPanel() {
+        const moneyRainRef = db.ref('moneyRainEvent');
+        const statusEl = document.getElementById('moneyRainStatus');
+        const startBtn = document.getElementById('startMoneyRainBtn');
+        const stopBtn = document.getElementById('stopMoneyRainBtn');
+        moneyRainRef.on('value', (snapshot) => {
+            let status = 'idle';
+            if (snapshot.exists() && snapshot.val().status) {
+                status = snapshot.val().status;
+            }
+            statusEl.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            statusEl.className = 'status-display ' + status;
+            if (status === 'idle' || status === 'finished') {
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            } else {
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+            }
+        });
+        startBtn.addEventListener('click', startMoneyRain);
+        stopBtn.addEventListener('click', stopMoneyRain);
+    }
+
+    function startMoneyRain() {
+        const amountInput = document.getElementById('moneyRainAmount');
+        const durationInput = document.getElementById('moneyRainDuration');
+        const amount = parseFloat(amountInput.value);
+        const duration = parseInt(durationInput.value, 10);
+        if (isNaN(amount) || amount <= 0) {
+            alert("Zəhmət olmasa, düzgün müsbət məbləğ daxil edin.");
+            return;
+        }
+        if (isNaN(duration) || duration < 10) {
+            alert("Oyun müddəti ən az 10 saniyə olmalıdır.");
+            return;
+        }
+        if (!confirm(`${amount.toFixed(2)} AZN məbləğində Para Yağışını başlatmaq istədiyinizə əminsiniz?`)) {
+            return;
+        }
+        const eventData = {
+            status: 'pending',
+            totalAmount: amount,
+            startTime: Date.now() + 30000,
+            duration: duration * 1000,
+            participants: null,
+            leaderboard: null
+        };
+        setTimeout(() => { db.ref('moneyRainEvent/status').set('active'); }, 30000);
+        setTimeout(() => {
+            db.ref('moneyRainEvent').once('value', snapshot => {
+                const event = snapshot.val();
+                if(event && event.status === 'active') {
+                    calculateResultsFromAdmin(event);
+                }
+            });
+        }, 30000 + (duration * 1000) + 1000); // ehtiyat üçün 1 saniyə əlavə
+        db.ref('moneyRainEvent').set(eventData)
+            .then(() => alert("Para Yağışı başladılır! İstifadəçilər 30 saniyə sonra oyuna başlaya biləcəklər."))
+            .catch(error => alert("Xəta: " + error.message));
+    }
+    function stopMoneyRain() {
+        if (!confirm("Para Yağışını dayandırmaq istədiyinizə əminsiniz?")) {
+            return;
+        }
+        db.ref('moneyRainEvent').update({ status: 'idle' })
+            .then(() => alert("Para Yağışı uğurla dayandırıldı."))
+            .catch(error => alert("Xəta: " + error.message));
+    }
+    function calculateResultsFromAdmin(eventData) {
+        const participants = eventData.participants || {};
+        const totalAmount = eventData.totalAmount;
+        let totalScore = 0;
+        Object.values(participants).forEach(p => { totalScore += p.score; });
+        if (totalScore === 0) {
+            db.ref('moneyRainEvent/status').set('finished');
+            setTimeout(() => { db.ref('moneyRainEvent').update({ status: 'idle' }); }, 15000);
+            return;
+        }
+        const leaderboard = {};
+        const allUpdates = {}; // Balans və tarixçə üçün ümumi yeniləmə obyekti
+        for (const uid in participants) {
+            const participant = participants[uid];
+            const reward = (participant.score / totalScore) * totalAmount;
+            const finalReward = parseFloat(reward.toFixed(2));
+            if (finalReward > 0) {
+                leaderboard[uid] = { displayName: participant.displayName, score: participant.score, reward: finalReward };
+                allUpdates[`/balances/${uid}/amount`] = firebase.database.ServerValue.increment(finalReward);
+                const newDepositKey = db.ref('deposits').push().key;
+                allUpdates[`/deposits/${newDepositKey}`] = {
+                    uid: uid,
+                    amount: finalReward,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP,
+                    type: 'deposit',
+                    description: 'Para Yağışı Mükafatı'
+                };
+            }
+        }
+        allUpdates[`/moneyRainEvent/leaderboard`] = leaderboard;
+        allUpdates[`/moneyRainEvent/status`] = 'finished';
+        db.ref().update(allUpdates); // Bütün məlumatları bir dəfəyə yaz
+        setTimeout(() => {
+            db.ref('moneyRainEvent').update({ status: 'idle' });
+        }, 30000);
+    }
+</script>
+</body>
+</html>
