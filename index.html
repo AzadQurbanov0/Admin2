@@ -14,8 +14,8 @@ html{height:100%;}
 body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,'Helvetica Neue',Arial,'Apple Color Emoji','Segoe UI Emoji';
   color:var(--text); background:linear-gradient(135deg,var(--bg1),var(--bg2) 50%,var(--bg3));
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-height: 100vh; overflow:hidden; padding-bottom: 70px; /* Footer üçün yer saxlayaq */
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start; /* Dəyişdirildi */
+  min-height: 100vh; overflow-y: auto; padding-top: 70px; padding-bottom: 70px;
 }
 .wrap{display:grid;place-items:center;gap:12px;text-align:center;padding:20px;}
 .user-info{font-size:1rem;font-weight:600;opacity:.9;margin-bottom:6px;}
@@ -32,10 +32,10 @@ body{
 .balance .symbol{font-size:clamp(1rem,2.5vw,1.5rem);opacity:.9;margin-right:4px;}
 .balance .value{font-size:clamp(1.5rem,5vw,2.5rem);line-height:1;}
 .google-btn{ margin-top:14px; padding:8px 16px; font-size:0.95rem; background:#4285F4; color:white; border:none; border-radius:8px; cursor:pointer; display:flex; align-items:center; gap:6px; font-weight:600;}
-.action-buttons button { position: fixed; right: 20px; padding: 8px 14px; font-size: 0.9rem; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+.action-buttons button { position: fixed; right: 20px; padding: 8px 14px; font-size: 0.9rem; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; z-index: 1000; }
 #payBtn { top: 20px; background: #22c55e; }
-#cekBtn { top: 58px; background: #2563eb; }
-#pulCekBtn { top: 96px; background: #f59e0b; }
+#cekBtn { top: 68px; background: #2563eb; } /* Məsafə artırıldı */
+#pulCekBtn { top: 116px; background: #f59e0b; } /* Məsafə artırıldı */
 #notification-bell { position: fixed; top: 20px; left: 20px; font-size: 28px; cursor: pointer; user-select: none; z-index: 10000; }
 #notification-badge { position: absolute; top: -5px; right: -8px; background: #ef4444; color: white; width: 20px; height: 20px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; }
 .modalOverlay{ position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999; display:none; }
@@ -60,7 +60,7 @@ body{
 .status-cancelled { border-left-color: #6b7280; } .status-cancelled .notification-item-status { background-color: #6b7280; }
 .status-deposit { border-left-color: #3b82f6; } .status-deposit .notification-item-status { background-color: #3b82f6; }
 .cancel-btn { background: var(--red); color: white; border: none; padding: 4px 8px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
-#support-widget { position: fixed; bottom: 80px; right: 20px; z-index: 10000; } /* Yuxarı qaldırıldı */
+#support-widget { position: fixed; bottom: 80px; right: 20px; z-index: 10000; }
 #chat-toggle-btn { background: #0ea5e9; color: white; width: 60px; height: 60px; border-radius: 50%; border: none; font-size: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; }
 #chat-notification-badge { position: absolute; top: 0px; right: 0px; background: #ef4444; color: white; min-width: 22px; height: 22px; border-radius: 50%; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; padding: 2px; }
 #chat-window { position: absolute; bottom: 80px; right: 0; width: 320px; max-width: 90vw; height: 400px; background: var(--bg3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: none; flex-direction: column; overflow: hidden; }
@@ -93,52 +93,52 @@ body{
 .status-text .label { font-weight: bold; display: block; margin-bottom: 4px; }
 .status-text .description { font-size: 0.9rem; opacity: 0.8; }
 #countdown-banner {
-  display: none;
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  transform: translateX(120%);
-  background: rgba(15, 12, 41, 0.8);
-  backdrop-filter: blur(5px);
-  color: #f59e0b;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  z-index: 10005;
-  font-weight: 600;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-  width: auto;
-  transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  display: none; position: fixed; top: 20px; right: 20px; transform: translateX(120%);
+  background: rgba(15, 12, 41, 0.8); backdrop-filter: blur(5px); color: #f59e0b;
+  padding: 12px 20px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.3);
+  z-index: 10005; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  width: auto; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
-#countdown-banner.visible {
-  transform: translateX(0);
-}
+#countdown-banner.visible { transform: translateX(0); }
 .falling-coin {
-  position: fixed;
-  top: -60px;
-  font-size: 2.2rem;
-  user-select: none;
-  pointer-events: auto;
-  cursor: pointer;
-  z-index: 10003;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
-  padding: 5px;
+  position: fixed; top: -60px; font-size: 2.2rem; user-select: none;
+  pointer-events: auto; cursor: pointer; z-index: 10003;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); padding: 5px;
 }
 @keyframes fall-animation {
   from { transform: translateY(0) rotateZ(0deg); opacity: 1; }
   to { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
 }
-.modalContent ul { list-style: none; padding: 0; width: 100%; text-align: left; margin-top: 15px; max-height: 400px; overflow-y: auto; }
-.modalContent li { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px; font-size: 0.95rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
-.modalContent li:first-child { background: #f59e0b; color: var(--bg1); font-weight: bold; }
+.page-list ul { list-style: none; padding: 0; width: 100%; text-align: left; margin-top: 15px; max-height: 400px; overflow-y: auto; }
+.page-list li { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 1rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+.page-list li:first-child { background: #f59e0b; color: var(--bg1); font-weight: bold; }
 #game-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10002; display: none; }
-/* Yeni Footer Menyu Stili */
 footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 5px 0; z-index: 1001; border-top: 1px solid rgba(255,255,255,0.1); }
-.nav-item { color: var(--text); text-decoration: none; text-align: center; font-size: 0.75rem; padding: 8px 12px; border-radius: 8px; transition: background 0.2s ease; }
+.nav-item { color: var(--text); text-decoration: none; text-align: center; font-size: 0.75rem; padding: 8px 12px; border-radius: 8px; transition: background 0.2s ease; cursor:pointer;}
 .nav-item span { font-size: 1.5rem; display: block; }
-.nav-item.active, .nav-item:active { background: rgba(255,255,255,0.1); }
-#helpModal .modalContent { text-align: left; }
-#helpModal p { margin-bottom: 10px; line-height: 1.6; }
+.nav-item.active { background: rgba(255,255,255,0.2); font-weight: bold; }
+
+/* Yeni Səhifə stilləri */
+.page { display: none; width: 100%; max-width: 500px; padding: 15px; animation: fadeIn 0.5s ease; }
+.page.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.page-header { font-size: 1.8rem; font-weight: 700; margin-bottom: 20px; text-align: center; }
+
+/* Yeni Akkordeon stilləri */
+.accordion {
+    background-color: rgba(255,255,255,0.08); color: var(--text); cursor: pointer;
+    padding: 18px; width: 100%; border: none; text-align: left; outline: none;
+    font-size: 1rem; font-weight: 600; transition: background-color 0.3s ease;
+    border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+}
+.accordion:after { content: '\\2795'; font-size: 13px; color: #777; }
+.accordion.active:after { content: "\\2796"; }
+.accordion:hover, .accordion.active { background-color: rgba(255,255,255,0.15); }
+.panel {
+    padding: 0 18px; background-color: transparent; max-height: 0;
+    overflow: hidden; transition: max-height 0.3s ease-out; margin-bottom: 10px;
+}
+.panel p { margin: 15px 0; line-height: 1.6; opacity: 0.9; }
 </style>
 </head>
 <body>
@@ -151,36 +151,71 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
 <div class="content-wrapper">
     <div id="notification-bell"><span>🔔</span><div id="notification-badge" style="display:none;">1</div></div>
     <div id="status-icon"><span>ℹ️</span></div>
-    <main class="wrap">
-        <div id="userInfo" class="user-info"></div>
-        <div class="card">
-            <div class="bag">💰</div>
-            <div class="balance">
-                <span class="symbol">AZN</span>
-                <span id="balance" class="value">0.00</span>
-            </div>
-        </div>
-        <button class="google-btn" id="loginBtn">🌐 Giriş</button>
-    </main>
     <div class="action-buttons"><button id="payBtn">💲 YÜKLƏ</button><button id="cekBtn">📷 ÇEK</button><button id="pulCekBtn">🏦 ÇEK</button></div>
+
+    <div id="main-page" class="page active">
+        <main class="wrap">
+            <div id="userInfo" class="user-info"></div>
+            <div class="card">
+                <div class="bag">💰</div>
+                <div class="balance">
+                    <span class="symbol">AZN</span>
+                    <span id="balance" class="value">0.00</span>
+                </div>
+            </div>
+            <button class="google-btn" id="loginBtn">🌐 Giriş</button>
+        </main>
+    </div>
+
+    <div id="leaderboard-page" class="page">
+        <h2 class="page-header">Para Yağışı Nəticələri</h2>
+        <div id="leaderboard-list" class="page-list"><ul><li>Yüklənir...</li></ul></div>
+    </div>
+
+    <div id="stats-page" class="page">
+        <h2 class="page-header">Statistika</h2>
+        <div id="stats-list" class="page-list"><ul><li>Yüklənir...</li></ul></div>
+    </div>
+
+    <div id="help-page" class="page">
+        <h2 class="page-header">Kömək</h2>
+        <button class="accordion">"Para Çuvalı" nədir?</button>
+        <div class="panel">
+            <p>Bu, istifadəçilərin müxtəlif yollarla virtual balans artıra və "Para Yağışı" kimi oyunlarda iştirak edərək real mükafatlar qazana biləcəyi bir əyləncə platformasıdır.</p>
+        </div>
+
+        <button class="accordion">Balansı necə artırmaq olar?</button>
+        <div class="panel">
+            <p>Əsas səhifədəki "YÜKLƏ" düyməsini istifadə edərək təlimatlara əməl edə bilərsiniz.</p>
+        </div>
+
+        <button class="accordion">Pul çıxarmaq mümkündür?</button>
+        <div class="panel">
+            <p>Bəli, "ÇEK" düyməsini istifadə edərək bank kartınıza pul çıxarışı üçün sorğu göndərə bilərsiniz. Sorğular administrasiya tərəfindən yoxlanılır.</p>
+        </div>
+        
+        <button class="accordion">"Para Yağışı" nədir?</button>
+        <div class="panel">
+            <p>Bu, təsadüfi zamanlarda başlayan bir oyundur. Ekrandan düşən ikonları tutaraq xal qazanırsınız. Oyun sonunda ən çox xal toplayanlar balanslarına real pul mükafatı əldə edirlər. Liderlər cədvəlindən nəticələrə baxa bilərsiniz.</p>
+        </div>
+    </div>
     <div class="modalOverlay" id="payModal"><div class="modalContent"><p>💲 PUL YÜKLƏ M10 077 543 50 53</p><button class="close-modal-btn">Bağla</button></div></div>
     <div class="modalOverlay" id="cekModal"><div class="modalContent"><p>ÇƏKİN ŞƏKLİNİ GÖNDƏRMƏYƏ BAS</p><button id="sendCekBtn">GÖNDƏR</button><button class="close-modal-btn">Bağla</button></div></div>
     <div class="modalOverlay" id="pulCekModal"><div class="modalContent"><h3>Pul Çıxarma Sorğusu</h3><input type="number" id="withdrawAmount" placeholder="Məbləğ (AZN)" required><input type="text" id="userName" placeholder="Ad" required><input type="text" id="userSurname" placeholder="Soyad" required><input type="tel" id="cardNumber" placeholder="Kart nömrəsi (16 rəqəm)" maxlength="16" required><button id="withdrawBtn">💸 PUL ÇIXART</button><button class="close-modal-btn">Bağla</button></div></div>
     <div class="modalOverlay" id="notificationsModal"><div class="modalContent"><h3>Hesab Çıxarışı və Elanlar</h3><div class="filter-buttons"><button class="filter-btn" onclick="fetchAndDisplayHistory('7d')">Son 7 gün</button><button class="filter-btn" onclick="fetchAndDisplayHistory('month')">Bu Ay</button><button class="filter-btn active" onclick="fetchAndDisplayHistory('all')">Bütün Tarixçə</button></div><div id="announcements-container"></div><div id="notifications-list"></div><button class="close-modal-btn">Bağla</button></div></div>
     <div class="modalOverlay" id="statusModal"><div class="modalContent"><h3>Sistem Vəziyyəti</h3><div id="status-list"><p>Məlumatlar yüklənir...</p></div><button class="close-modal-btn">Bağla</button></div></div>
-    <div class="modalOverlay" id="leaderboardModal"><div class="modalContent"><h3>Para Yağışı Nəticələri</h3><div id="leaderboard-list"><ul><li>Yüklənir...</li></ul></div><button class="close-modal-btn">Bağla</button></div></div>
-    <div class="modalOverlay" id="statsModal"><div class="modalContent"><h3>Statistika (Ən Yüksək Balanslar)</h3><div id="stats-list"><ul><li>Yüklənir...</li></ul></div><button class="close-modal-btn">Bağla</button></div></div>
-    <div class="modalOverlay" id="helpModal"><div class="modalContent"><h3>Kömək</h3><p><b>"Para Çuvalı" nədir?</b></p><p>Bu, istifadəçilərin müxtəlif yollarla virtual balans artıra və "Para Yağışı" kimi oyunlarda iştirak edərək real mükafatlar qazana biləcəyi bir əyləncə platformasıdır.</p><p><b>Balansı necə artırmaq olar?</b></p><p>Əsas səhifədəki "YÜKLƏ" düyməsini istifadə edərək təlimatlara əməl edə bilərsiniz.</p><p><b>Pul çıxarmaq mümkündür?</b></p><p>Bəli, "ÇEK" düyməsini istifadə edərək bank kartınıza pul çıxarışı üçün sorğu göndərə bilərsiniz. Sorğular administrasiya tərəfindən yoxlanılır.</p><p><b>"Para Yağışı" nədir?</b></p><p>Bu, təsadüfi zamanlarda başlayan bir oyundur. Ekrandan düşən ikonları tutaraq xal qazanırsınız. Oyun sonunda ən çox xal toplayanlar balanslarına real pul mükafatı əldə edirlər. Liderlər cədvəlindən nəticələrə baxa bilərsiniz.</p><button class="close-modal-btn">Bağla</button></div></div>
+    <div class="modalOverlay" id="leaderboardResultModal"><div class="modalContent"><h3>Para Yağışı Nəticələri</h3><div id="leaderboard-result-list"></div><button class="close-modal-btn">Bağla</button></div></div>
+
     <div id="support-widget"><div id="chat-window"><div id="chat-header">Dəstək</div><div id="chat-messages"></div><div id="chat-input-area"><input type="text" id="chat-input" placeholder="Mesajınızı yazın..."><button id="send-chat-btn"> göndər</button></div></div><button id="chat-toggle-btn"><span>💬</span><div id="chat-notification-badge" style="display:none;"></div></button></div>
 </div>
 
 <footer>
-    <a href="#" class="nav-item active" id="homeBtn"><span>🏠</span>Əsas</a>
-    <a href="#" class="nav-item" id="leaderboardBtn"><span>🏅</span>Liderlər</a>
-    <a href="#" class="nav-item" id="statsBtn"><span>📊</span>Statistika</a>
-    <a href="#" class="nav-item" id="helpBtn"><span>❓</span>Kömək</a>
-</footer>
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+    <a class="nav-item active" id="homeBtn"><span>🏠</span>Əsas</a>
+    <a class="nav-item" id="leaderboardBtn"><span>🏅</span>Liderlər</a>
+    <a class="nav-item" id="statsBtn"><span>📊</span>Statistika</a>
+    <a class="nav-item" id="helpBtn"><span>❓</span>Kömək</a>
+      </footer>
+      <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
 <script>
@@ -241,21 +276,80 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
       function initializeSupportChat(user) { const chatWindow = document.getElementById('chat-window'), chatToggleBtn = document.getElementById('chat-toggle-btn'), chatMessages = document.getElementById('chat-messages'), chatInput = document.getElementById('chat-input'), sendChatBtn = document.getElementById('send-chat-btn'), chatBadge = document.getElementById('chat-notification-badge'); if (messageListener) messageListener.off(); if (chatStateListener) chatStateListener.off(); chatToggleBtn.onclick = () => { const isHidden = chatWindow.style.display === 'none' || chatWindow.style.display === ''; chatWindow.style.display = isHidden ? 'flex' : 'none'; if (isHidden) { db.ref(`support_chats/${user.uid}/new_message_for_user_count`).set(0); } }; const chatRef = db.ref(`support_chats/${user.uid}`); chatStateListener = chatRef.on('value', (snapshot) => { const count = snapshot.val()?.new_message_for_user_count || 0; chatBadge.textContent = count; chatBadge.style.display = count > 0 ? 'flex' : 'none'; }); chatMessages.innerHTML = ''; const messagesRef = db.ref(`support_chats/${user.uid}/messages`).limitToLast(50); messageListener = messagesRef.on('child_added', (snapshot) => { const message = snapshot.val(), messageDiv = document.createElement('div'); messageDiv.className = `message ${message.sender === 'admin' ? 'admin' : 'user'}`; messageDiv.textContent = message.text; chatMessages.appendChild(messageDiv); chatMessages.scrollTop = chatMessages.scrollHeight; }); const sendMessage = () => { const text = chatInput.value.trim(); if (text === '') return; const messageData = { text: text, sender: user.uid, timestamp: firebase.database.ServerValue.TIMESTAMP }; db.ref(`support_chats/${user.uid}/messages`).push(messageData); db.ref(`support_chats/${user.uid}`).update({ user_email: user.email, last_message: text, last_updated: firebase.database.ServerValue.TIMESTAMP, new_message_for_admin: true }); chatInput.value = ''; }; sendChatBtn.onclick = sendMessage; chatInput.onkeydown = (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } }; }
     document.getElementById('status-icon').addEventListener('click', () => { document.getElementById('statusModal').style.display = 'flex'; });
     function initializeSystemStatus() { const statusRef = db.ref('system_status'); const statusListContainer = document.getElementById('status-list'); statusRef.on('value', (snapshot) => { if (!snapshot.exists()) { statusListContainer.innerHTML = '<p>Sistem vəziyyəti haqqında məlumat yoxdur.</p>'; return; } const statuses = snapshot.val(); statusListContainer.innerHTML = ''; const sortedStatuses = Object.values(statuses).sort((a, b) => a.order - b.order); sortedStatuses.forEach(data => { const itemDiv = document.createElement('div'); itemDiv.className = 'status-item'; itemDiv.innerHTML = ` <div class="status-indicator ${data.state || 'paused'}"></div> <div class="status-text"> <span class="label">${data.label}</span> <span class="description">${data.status_text}</span> </div> `; statusListContainer.appendChild(itemDiv); }); }); }
-    window.onload = function() { const preloader = document.getElementById('preloader'); const animatedBag = document.getElementById('animated-bag'); const finalBag = document.querySelector('.card .bag'); const contentWrapper = document.querySelector('.content-wrapper'); preloader.style.opacity = '0'; setTimeout(() => { animatedBag.style.opacity = '1'; animatedBag.style.transition = 'all 1.2s cubic-bezier(0.68, -0.6, 0.32, 1.6)'; }, 200); setTimeout(() => { const finalBagRect = finalBag.getBoundingClientRect(); animatedBag.style.left = `${finalBagRect.left + finalBagRect.width / 2}px`; animatedBag.style.top = `${finalBagRect.top + finalBagRect.height / 2}px`; animatedBag.style.fontSize = getComputedStyle(finalBag).fontSize; }, 1000); setTimeout(() => { preloader.style.display = 'none'; animatedBag.style.display = 'none'; contentWrapper.style.opacity = '1'; contentWrapper.style.visibility = 'visible'; }, 2200); };
+    window.onload = function() { const preloader = document.getElementById('preloader'); const animatedBag = document.getElementById('animated-bag'); const finalBag = document.querySelector('#main-page .card .bag'); const contentWrapper = document.querySelector('.content-wrapper'); preloader.style.opacity = '0'; setTimeout(() => { animatedBag.style.opacity = '1'; animatedBag.style.transition = 'all 1.2s cubic-bezier(0.68, -0.6, 0.32, 1.6)'; }, 200); setTimeout(() => { const finalBagRect = finalBag.getBoundingClientRect(); animatedBag.style.left = `${finalBagRect.left + finalBagRect.width / 2}px`; animatedBag.style.top = `${finalBagRect.top + finalBagRect.height / 2}px`; animatedBag.style.fontSize = getComputedStyle(finalBag).fontSize; }, 1000); setTimeout(() => { preloader.style.display = 'none'; animatedBag.style.display = 'none'; contentWrapper.style.opacity = '1'; contentWrapper.style.visibility = 'visible'; }, 2200); };
     let countdownInterval; let rainTimeout; let currentRainInterval = 500; let currentRainSpeed = 3.5;
-    function listenForMoneyRain() { const moneyRainRef = db.ref('moneyRainEvent'); moneyRainRef.on('value', (snapshot) => { const event = snapshot.val(); if (!event) return; const leaderboardModal = document.getElementById('leaderboardModal'); switch (event.status) { case 'pending': leaderboardModal.style.display = 'none'; showCountdown(event.startTime); break; case 'active': leaderboardModal.style.display = 'none'; hideCountdown(); startRainAnimation(event.duration); break; case 'finished': hideRainAnimation(); hideCountdown(); showLeaderboard(event.leaderboard); break; default: leaderboardModal.style.display = 'none'; hideRainAnimation(); hideCountdown(); break; } }); }
+    function listenForMoneyRain() { const moneyRainRef = db.ref('moneyRainEvent'); moneyRainRef.on('value', (snapshot) => { const event = snapshot.val(); if (!event) return; switch (event.status) { case 'pending': showCountdown(event.startTime); break; case 'active': hideCountdown(); startRainAnimation(event.duration); break; case 'finished': hideRainAnimation(); hideCountdown(); showLeaderboardResult(event.leaderboard); break; default: hideRainAnimation(); hideCountdown(); break; } }); }
     function showCountdown(startTime) { const banner = document.getElementById('countdown-banner'); const timerEl = document.getElementById('countdown-timer'); banner.style.display = 'block'; setTimeout(() => banner.classList.add('visible'), 50); clearInterval(countdownInterval); countdownInterval = setInterval(() => { const remaining = Math.max(0, Math.round((startTime - Date.now()) / 1000)); timerEl.textContent = remaining; if (remaining <= 0) { clearInterval(countdownInterval); } }, 1000); }
     function hideCountdown() { const banner = document.getElementById('countdown-banner'); banner.classList.remove('visible'); clearInterval(countdownInterval); }
     function startRainAnimation(duration) { if (rainTimeout) clearTimeout(rainTimeout); document.getElementById('game-overlay').style.display = 'block'; currentRainInterval = 500; currentRainSpeed = 3.5; function gameLoop() { createFallingCoin(); rainTimeout = setTimeout(gameLoop, currentRainInterval); } gameLoop(); }
     function hideRainAnimation() { document.getElementById('game-overlay').style.display = 'none'; clearTimeout(rainTimeout); rainTimeout = null; document.querySelectorAll('.falling-coin').forEach(c => c.remove()); }
     function createFallingCoin() { const coin = document.createElement('div'); coin.className = 'falling-coin'; coin.textContent = ['🪙', '💰', '💵', '💎'][Math.floor(Math.random() * 4)]; coin.style.left = `${Math.random() * 95}vw`; coin.style.animation = `fall-animation ${Math.random() * 1 + currentRainSpeed}s linear forwards`; coin.onclick = (event) => collectCoin(event.currentTarget); document.body.appendChild(coin); setTimeout(() => coin.remove(), (currentRainSpeed + 1.5) * 1000); }
     function collectCoin(coinElement) { const user = auth.currentUser; if (!user || !coinElement) return; coinElement.remove(); currentRainSpeed = Math.max(1.5, currentRainSpeed - 0.05); currentRainInterval = Math.max(100, currentRainInterval - 5); const userScoreRef = db.ref(`moneyRainEvent/participants/${user.uid}`); userScoreRef.transaction((data) => { if (data === null) { return { score: 1, displayName: user.displayName }; } else { return { ...data, score: (data.score || 0) + 1 }; } }); }
-    function showLeaderboard(leaderboardData) { if (!leaderboardData) return; const modal = document.getElementById('leaderboardModal'); const listContainer = document.getElementById('leaderboard-list'); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); let leaderboardHtml = '<ul>'; if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; }
-      // YENİ FUNKSİYALAR VƏ EVENT LISTENERS
-    document.getElementById('leaderboardBtn').addEventListener('click', (e) => { e.preventDefault(); showLeaderboard(null); const moneyRainRef = db.ref('moneyRainEvent/leaderboard'); moneyRainRef.once('value', (snapshot) => { if(snapshot.exists()) { showLeaderboard(snapshot.val()); } else { document.getElementById('leaderboard-list').innerHTML = "<ul><li>Hələ heç bir nəticə yoxdur.</li></ul>"; } }); document.getElementById('leaderboardModal').style.display = 'flex'; });
-    document.getElementById('statsBtn').addEventListener('click', (e) => { e.preventDefault(); showStatistics(); document.getElementById('statsModal').style.display = 'flex'; });
-    document.getElementById('helpBtn').addEventListener('click', (e) => { e.preventDefault(); document.getElementById('helpModal').style.display = 'flex'; });
-    document.getElementById('homeBtn').addEventListener('click', (e) => { e.preventDefault(); document.querySelectorAll('.modalOverlay').forEach(modal => modal.style.display = 'none'); });
+      function showLeaderboardResult(leaderboardData) {
+        if (!leaderboardData) return;
+        const modal = document.getElementById('leaderboardResultModal');
+        const listContainer = document.getElementById('leaderboard-result-list');
+        const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward);
+        let leaderboardHtml = '<ul>';
+        if (sortedPlayers.length > 0) {
+            sortedPlayers.slice(0, 20).forEach((player, index) => {
+                leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`;
+            });
+        } else {
+            leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>';
+        }
+        leaderboardHtml += '</ul>';
+        listContainer.innerHTML = leaderboardHtml;
+        modal.style.display = 'flex';
+    }
+    
+    // YENİ FUNKSİYALAR
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        
+        if (pageId === 'leaderboard-page') {
+            document.getElementById('leaderboardBtn').classList.add('active');
+            fetchLeaderboard();
+        } else if (pageId === 'stats-page') {
+            document.getElementById('statsBtn').classList.add('active');
+            fetchStatistics();
+        } else if (pageId === 'help-page') {
+            document.getElementById('helpBtn').classList.add('active');
+        } else {
+            document.getElementById('homeBtn').classList.add('active');
+        }
+    }
+
+    document.getElementById('homeBtn').addEventListener('click', () => switchPage('main-page'));
+    document.getElementById('leaderboardBtn').addEventListener('click', () => switchPage('leaderboard-page'));
+    document.getElementById('statsBtn').addEventListener('click', () => switchPage('stats-page'));
+    document.getElementById('helpBtn').addEventListener('click', () => switchPage('help-page'));
+
+    function fetchLeaderboard() {
+        const listContainer = document.getElementById('leaderboard-list');
+        listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>";
+        const moneyRainRef = db.ref('moneyRainEvent/leaderboard');
+        moneyRainRef.once('value', (snapshot) => {
+            if(snapshot.exists()) {
+                const leaderboardData = snapshot.val();
+                const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward);
+                let leaderboardHtml = '<ul>';
+                if (sortedPlayers.length > 0) {
+                    sortedPlayers.slice(0, 20).forEach((player, index) => {
+                        leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`;
+                    });
+                } else {
+                    leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>';
+                }
+                leaderboardHtml += '</ul>';
+                listContainer.innerHTML = leaderboardHtml;
+            } else {
+                listContainer.innerHTML = "<ul><li>Hələ heç bir nəticə yoxdur.</li></ul>";
+            }
+        });
+    }
 
     function maskDisplayName(name) {
         if (!name || name.length < 3) return "***";
@@ -265,7 +359,7 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
         return `${start}${middle}${end}`;
     }
 
-    function showStatistics() {
+    function fetchStatistics() {
         const statsList = document.getElementById('stats-list');
         statsList.innerHTML = "<ul><li>Yüklənir...</li></ul>";
         const balancesRef = db.ref('balances').orderByChild('amount').limitToLast(25);
@@ -311,6 +405,19 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,
         });
     }
 
+    // Akkordeon üçün JavaScript
+    const accordions = document.getElementsByClassName("accordion");
+    for (let i = 0; i < accordions.length; i++) {
+        accordions[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            const panel = this.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        });
+    }
 </script>
 </body>
 </html>
