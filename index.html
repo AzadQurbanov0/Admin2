@@ -187,7 +187,7 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--car
 .history-amount .history-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
   #top-header { position: fixed; top: 0; left: 0; width: 100%; background: var(--card); backdrop-filter: blur(10px); z-index: 1001; padding: 10px 15px; display: none; justify-content: space-around; align-items: center; border-bottom: 1px solid var(--border-color); }
 .header-balance { display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 0.9rem; }
-.header-balance span:first-child { font-size: 1.2rem; }
+.header-balance span { font-size: 1.2rem; transition: color 0.4s ease-in-out, transform 0.4s ease-in-out; }
 .settings-card { width: 100%; padding: 20px; margin-bottom: 15px; background: var(--card); border: 1px solid var(--border-color); border-radius: 12px; }
 .profile-section { display: flex; flex-direction: column; align-items: center; text-align: center; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); position: relative; }
 .profile-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; }
@@ -262,18 +262,18 @@ input:checked + .slider:before { transform: translateX(22px); }
   border-color: #c0c0c0;
   box-shadow: 0 0 15px #c0c0c0, inset 0 0 10px #c0c0c0;
 }
-.balance-change {
-  transition: all 0.3s ease-in-out;
+.balance .value {
+    transition: color 0.4s ease-in-out, transform 0.4s ease-in-out;
 }
 .balance-increase {
-  color: var(--accent) !important;
-  transform: scale(1.1);
-  text-shadow: 0 0 10px var(--accent);
+  color: #22c55e !important; /* Yaşıl rəng */
+  transform: scale(1.15);
+  text-shadow: 0 0 12px #22c55e;
 }
 .balance-decrease {
-  color: var(--red) !important;
-  transform: scale(1.1);
-  text-shadow: 0 0 10px var(--red);
+  color: #dc2626 !important; /* Qırmızı rəng */
+  transform: scale(1.15);
+  text-shadow: 0 0 12px #dc2626;
 }
 .page-list li {
   cursor: pointer;
@@ -435,7 +435,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="settings-card settings-section">
             <div class="setting-item"><span>Qaranlıq Rejim</span><label class="toggle-switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label></div>
             <div class="setting-item" id="help-section-in-settings" style="cursor: pointer;"><span>Kömək və Məlumat</span><span>></span></div>
-            <div class="setting-item"><span>Versiya</span><span>2.1.0</span></div>
+            <div class="setting-item"><span>Versiya</span><span>2.2.0</span></div>
         </div>
         <div class="settings-card danger-zone">
             <button id="logoutBtn" class="btn-logout">Çıxış Et</button>
@@ -489,21 +489,22 @@ input:checked + .slider:before { transform: translateX(22px); }
     const db = firebase.database();
     
     let listeners = {};
-    let displayedBalance = 0; // Balansın son vəziyyətini yadda saxlamaq üçün
+    let displayedBalance = 0;
     
     document.addEventListener('DOMContentLoaded', () => {
         const savedTheme = localStorage.getItem('theme') || 'dark';
         applyTheme(savedTheme);
     });
 
-    // BALANS ANİMASİYA FUNKSİYASI
-    function animateBalanceUpdate(elements, start, end) {
-        const duration = 1500; // Animasiya müddəti (ms)
+    function animateBalanceUpdate(element, start, end) {
+        if (!element) return;
+        
+        const duration = 1500;
         const range = end - start;
         if (range === 0) return;
 
         const changeClass = range > 0 ? 'balance-increase' : 'balance-decrease';
-        elements.forEach(el => el.classList.add(changeClass, 'balance-change'));
+        element.classList.add(changeClass);
 
         let startTime = null;
 
@@ -511,14 +512,15 @@ input:checked + .slider:before { transform: translateX(22px); }
             if (!startTime) startTime = timestamp;
             const progress = Math.min((timestamp - startTime) / duration, 1);
             const currentVal = start + range * progress;
-            elements.forEach(el => { if(el) el.textContent = currentVal.toFixed(2) });
+            element.textContent = currentVal.toFixed(2);
+            
             if (progress < 1) {
                 requestAnimationFrame(step);
             } else {
-                elements.forEach(el => { if(el) el.textContent = end.toFixed(2) });
+                element.textContent = end.toFixed(2);
                 setTimeout(() => {
-                    elements.forEach(el => { if(el) el.classList.remove(changeClass, 'balance-change') });
-                }, 500);
+                    element.classList.remove(changeClass);
+                }, 1000);
             }
         }
         requestAnimationFrame(step);
@@ -538,11 +540,11 @@ input:checked + .slider:before { transform: translateX(22px); }
             db.ref('users/' + user.uid).update({ displayName: user.displayName, email: user.email, photoURL: user.photoURL });
             
             db.ref('balances/' + user.uid + '/amount').once('value', snapshot => {
-                 displayedBalance = snapshot.val() || 0; // Başlanğıc balans dəyərini təyin et
+                 displayedBalance = snapshot.val() || 0;
             });
 
             attachAllListeners(user.uid);
-            listenForNewNotifications(user.uid); // Yeni bildirişləri dinlə
+            listenForNewNotifications(user.uid);
             supportWidget.style.display = 'block';
             initializeSupportChat(user);
             initializeSystemStatus();
@@ -553,13 +555,12 @@ input:checked + .slider:before { transform: translateX(22px); }
             settingsBtn.style.display = 'none';
             topHeader.style.display = 'none';
             document.getElementById('balance').textContent = '0.00';
-            displayedBalance = 0; // İstifadəçi çıxanda sıfırla
+            displayedBalance = 0;
             detachAllListeners();
             supportWidget.style.display = 'none';
         }
     });
-      // BİLDİRİŞ NİŞANI SİSTEMİ
-    function listenForNewNotifications(uid) {
+      function listenForNewNotifications(uid) {
         const lastCheck = localStorage.getItem('lastNotificationCheck') || 0;
         const notificationsRef = db.ref('withdrawals').orderByChild('uid').equalTo(uid);
 
@@ -584,7 +585,6 @@ input:checked + .slider:before { transform: translateX(22px); }
         });
     }
 
-    // ================== AYARLAR & PROFİL SİSTEMİ ==================
     function initializeSettingsPage() {
         const user = auth.currentUser;
         if (!user) return;
@@ -604,7 +604,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     document.getElementById('logoutBtn').addEventListener('click', () => { 
         if(confirm("Hesabdan çıxmaq istədiyinizə əminsiniz?")) { 
             if (listeners['notifications']) {
-                listeners['notifications'].off(); // Bildiriş listener-ini dayandır
+                listeners['notifications'].off();
             }
             auth.signOut().then(() => { 
                 switchPage('main-page'); 
@@ -617,7 +617,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     themeToggle.addEventListener('change', () => { applyTheme(themeToggle.checked ? 'dark' : 'light'); });
     document.getElementById('help-section-in-settings').addEventListener('click', () => switchPage('help-page'));
 
-      // ================== MAĞAZA SİSTEMİ ==================
     function initializeShop() { loadShopItems(); loadMyItems(); }
     function setupShopTabs() { document.querySelectorAll('.shop-tab').forEach(tab => { tab.addEventListener('click', () => { document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active')); tab.classList.add('active'); document.querySelectorAll('.shop-content').forEach(c => c.style.display = 'none'); document.getElementById(tab.dataset.tab).style.display = 'block'; }); }); }
     async function buyGems(aznAmount) { const user = auth.currentUser; if(!user) return; const gemPacks = {1: 100, 5: 550, 10: 1200}; const gemsToGet = gemPacks[aznAmount]; if(!confirm(`${aznAmount.toFixed(2)} AZN balansınızdan istifadə edərək ${gemsToGet} 💎 Almaz almaq istədiyinizə əminsiniz?`)) return; const balanceRef = db.ref(`/balances/${user.uid}/amount`); try { const balanceSnapshot = await balanceRef.once('value'); const currentBalance = balanceSnapshot.val() || 0; if(currentBalance < aznAmount) { alert("AZN balansınızda kifayət qədər vəsait yoxdur."); return; } const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(-aznAmount); updates[`/user_gems/${user.uid}/amount`] = firebase.database.ServerValue.increment(gemsToGet); await db.ref().update(updates); alert("Almazlar uğurla alındı!"); } catch (e) { alert("Xəta baş verdi: " + e.message); } }
@@ -626,7 +625,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     async function loadShopItems() { const shopContainer = document.getElementById('shop-grid-container'); const user = auth.currentUser; if(!user) return; const [shopSnapshot, inventorySnapshot] = await Promise.all([db.ref('/shop_items').once('value'), db.ref(`/user_inventory/${user.uid}`).once('value')]); if(!shopSnapshot.exists()) { shopContainer.innerHTML = "<p>Mağaza hazırda boşdur.</p>"; return; } let shopHTML = ''; const userInventory = inventorySnapshot.val() || {}; shopSnapshot.forEach(itemSnapshot => { const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const owned = !!userInventory[itemId]; shopHTML += `<div class="shop-item-card ${owned ? 'disabled' : ''}"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">💎 ${item.price_gems}</div><button class="btn-buy-item" onclick="buyItem('${itemId}', ${item.price_gems})" ${owned ? 'disabled' : ''}>${owned ? 'Alınıb' : 'Satın Al'}</button></div>`; }); shopContainer.innerHTML = shopHTML; }
     async function loadMyItems() { const myItemsContainer = document.getElementById('my-items-container'); const user = auth.currentUser; if(!user) return; const [inventorySnapshot, settingsSnapshot] = await Promise.all([db.ref(`/user_inventory/${user.uid}`).once('value'), db.ref(`/user_profile_settings/${user.uid}`).once('value')]); if(!inventorySnapshot.exists()){ myItemsContainer.innerHTML = "<p>Heç bir əşyanız yoxdur.</p>"; return; } let itemsHTML = ''; const userInventory = inventorySnapshot.val() || {}; const equippedSettings = settingsSnapshot.val() || {}; const itemPromises = Object.keys(userInventory).map(itemId => db.ref(`/shop_items/${itemId}`).once('value')); const itemSnapshots = await Promise.all(itemPromises); itemSnapshots.forEach(itemSnapshot => { if(!itemSnapshot.exists()) return; const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const isEquipped = equippedSettings.equipped_frame === itemId || equippedSettings.equipped_bag_skin === itemId; itemsHTML += `<div class="shop-item-card"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">${item.type === 'frame' ? 'Çərçivə' : 'Görünüş'}</div><button class="btn-equip-item" onclick="equipItem('${itemId}', '${item.type}')" ${isEquipped ? 'disabled' : ''}>${isEquipped ? 'Tətbiq edilib' : 'Tətbiq Et'}</button></div>`; }); myItemsContainer.innerHTML = itemsHTML; }
     
-    // ================== BİRJA FUNKSİYALARI ==================
     let currentCoinData = { price: 0, name: 'Coin' };
     function initializeBirja() { const user = auth.currentUser; if (!user) { alert("Birjaya baxmaq üçün daxil olun."); switchPage('main-page'); return; } listeners['birjaSettings'] = db.ref('birja_settings').on('value', snapshot => { if (snapshot.exists()) { currentCoinData = snapshot.val(); document.getElementById('birjaCoinName').textContent = currentCoinData.name || 'Coin Birjası'; document.getElementById('birjaCoinPrice').textContent = `1 ${currentCoinData.name || 'Coin'} = ${parseFloat(currentCoinData.price || 0).toFixed(2)} AZN`; } }); loadTransactionHistory(user.uid); }
     function loadTransactionHistory(uid) { const historyList = document.getElementById('transaction-history-list'); listeners['birjaTransactions'] = db.ref(`birja_transactions/${uid}`).orderByChild('timestamp').limitToLast(20).on('value', snapshot => { if (!snapshot.exists()) { historyList.innerHTML = '<p style="text-align:center; opacity:0.6;">Heç bir əməliyyat tapılmadı.</p>'; return; } let transactions = []; snapshot.forEach(child => { transactions.push(child.val()); }); transactions.reverse(); let historyHTML = ''; transactions.forEach(tx => { const isBuy = tx.type === 'buy'; const indicator = isBuy ? '▲' : '▼'; const indicatorClass = isBuy ? 'buy' : 'sell'; const actionText = isBuy ? 'Alındı' : 'Satıldı'; historyHTML += `<div class="history-item"><div class="history-indicator ${indicatorClass}">${indicator}</div><div class="history-details"><p>${tx.amountCoin.toFixed(2)} ${currentCoinData.name || 'Coin'} ${actionText}</p><div class="history-meta">${new Date(tx.timestamp).toLocaleString()}</div></div><div class="history-amount"><p>${tx.amountAzn.toFixed(2)} AZN</p><div class="history-meta">@ ${tx.pricePerCoin.toFixed(2)}</div></div></div>`; }); historyList.innerHTML = historyHTML; }); }
@@ -635,11 +633,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     function calculateBirjaTotal(type) { const price = parseFloat(currentCoinData.price) || 0; if (type === 'buy') { const amount = parseFloat(document.getElementById('buyAmount').value) || 0; const total = (amount * price).toFixed(2); document.getElementById('buySummary').innerText = `Yekun Məbləğ: ${total} AZN`; } else { const amount = parseFloat(document.getElementById('sellAmount').value) || 0; const total = (amount * price).toFixed(2); document.getElementById('sellSummary').innerText = `Əldə edəcəksiniz: ${total} AZN`; } }
     document.getElementById('buyCoinBtn').addEventListener('click', async () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); const amountToBuy = parseFloat(document.getElementById('buyAmount').value); if (isNaN(amountToBuy) || amountToBuy <= 0) return alert('Düzgün miqdar daxil edin.'); const cost = amountToBuy * currentCoinData.price; const balanceSnapshot = await db.ref(`/balances/${user.uid}/amount`).once('value'); const currentBalance = balanceSnapshot.val() || 0; if (cost > currentBalance) return alert('AZN balansınızda kifayət qədər vəsait yoxdur.'); const newTransactionKey = db.ref().child('birja_transactions').push().key; const transactionData = { type: 'buy', amountCoin: amountToBuy, amountAzn: cost, pricePerCoin: currentCoinData.price, timestamp: firebase.database.ServerValue.TIMESTAMP }; const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(-cost); updates[`/user_coins/${user.uid}/amount`] = firebase.database.ServerValue.increment(amountToBuy); updates[`/birja_transactions/${user.uid}/${newTransactionKey}`] = transactionData; db.ref().update(updates).then(() => { addXp(user.uid, Math.round(cost)); alert(`${amountToBuy.toFixed(2)} ${currentCoinData.name} uğurla alındı!`); document.getElementById('buyAmount').value = ''; calculateBirjaTotal('buy'); }).catch(error => alert('Xəta baş verdi: ' + error.message)); });
     document.getElementById('sellCoinBtn').addEventListener('click', async () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); const amountToSell = parseFloat(document.getElementById('sellAmount').value); if (isNaN(amountToSell) || amountToSell <= 0) return alert('Düzgün miqdar daxil edin.'); const coinSnapshot = await db.ref(`/user_coins/${user.uid}/amount`).once('value'); const currentCoins = coinSnapshot.val() || 0; if (amountToSell > currentCoins) return alert(`${currentCoinData.name} balansınızda kifayət qədər vəsait yoxdur.`); const earnings = amountToSell * currentCoinData.price; const newTransactionKey = db.ref().child('birja_transactions').push().key; const transactionData = { type: 'sell', amountCoin: amountToSell, amountAzn: earnings, pricePerCoin: currentCoinData.price, timestamp: firebase.database.ServerValue.TIMESTAMP }; const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(earnings); updates[`/user_coins/${user.uid}/amount`] = firebase.database.ServerValue.increment(-amountToSell); updates[`/birja_transactions/${user.uid}/${newTransactionKey}`] = transactionData; db.ref().update(updates).then(() => { addXp(user.uid, Math.round(earnings)); alert(`${amountToSell.toFixed(2)} ${currentCoinData.name} uğurla satıldı!`); document.getElementById('sellAmount').value = ''; calculateBirjaTotal('sell'); }).catch(error => alert('Xəta baş verdi: ' + error.message)); });
-
-    // ================== SƏVİYYƏ, XP, ID, TAPŞIRIQLAR SİSTEMİ ==================
-    const levelXpRequirements = [0, 250, 600, 1100, 1800, 2750, 4000, 5600, 7600, 10000, 15000, 22000, 30000];
+      const levelXpRequirements = [0, 250, 600, 1100, 1800, 2750, 4000, 5600, 7600, 10000, 15000, 22000, 30000];
     const levelRewards = { 5: {gems: 250, item: 'silver_frame'}, 10: {gems: 1000, item: 'gold_frame'} };
-    
     async function addXp(uid, amount) {
         const levelRef = db.ref(`/user_levels/${uid}`);
         try {
@@ -656,14 +651,13 @@ input:checked + .slider:before { transform: translateX(22px); }
             console.error("XP əlavə etmə xətası:", e);
         }
     }
-    
     async function levelUp(uid, newLevel) { alert(`Təbriklər! Siz ${newLevel}-ci səviyyəyə çatdınız!`); let gemsToAdd = 50 * (newLevel-1); const reward = levelRewards[newLevel]; if(reward) { if(reward.gems) gemsToAdd += reward.gems; if(reward.item) await db.ref(`/user_inventory/${uid}/${reward.item}`).set(true); } await db.ref(`/user_gems/${uid}/amount`).set(firebase.database.ServerValue.increment(gemsToAdd)); }
     async function generateUniqueFriendlyId() { let isUnique = false; let friendlyId; while (!isUnique) { friendlyId = Math.floor(10000 + Math.random() * 90000); const snapshot = await db.ref('friendly_id_lookup/' + friendlyId).once('value'); if (!snapshot.exists()) { isUnique = true; } } return friendlyId; }
     function checkAndAssignFriendlyId(user) { const userRef = db.ref('users/' + user.uid); userRef.child('friendlyId').once('value', async snapshot => { if (!snapshot.exists()) { const newId = await generateUniqueFriendlyId(); const updates = {}; updates[`/users/${user.uid}/friendlyId`] = newId; updates[`/friendly_id_lookup/${newId}`] = user.uid; db.ref().update(updates); } }); }
     async function checkDailyLogin(uid) { const today = new Date().toLocaleDateString(); const lastLoginRef = db.ref(`/users/${uid}/lastLogin`); const snapshot = await lastLoginRef.once('value'); if(snapshot.val() !== today) { await lastLoginRef.set(today); await addXp(uid, 10); console.log("Daily login XP awarded!"); } }
     async function initializeTasksPage() { const tasksContainer = document.getElementById('tasks-container'); const user = auth.currentUser; if(!user) return; const [tasksSnapshot, submissionsSnapshot] = await Promise.all([db.ref('/tasks').once('value'), db.ref(`/task_submissions/${user.uid}`).once('value')]); if(!tasksSnapshot.exists()) { tasksContainer.innerHTML = "<p>Hazırda aktiv tapşırıq yoxdur.</p>"; return; } let tasksHTML = ''; const submissions = submissionsSnapshot.val() || {}; tasksSnapshot.forEach(taskSnapshot => { const taskId = taskSnapshot.key; const task = taskSnapshot.val(); const status = submissions[taskId]?.status || 'new'; let btnHTML; switch(status) { case 'pending': btnHTML = `<button class="task-button pending" disabled>Yoxlanılır</button>`; break; case 'completed': btnHTML = `<button class="task-button completed" disabled>Tamamlandı</button>`; break; default: btnHTML = `<button class="task-button do" onclick="doTask('${taskId}', '${task.link}')">Tapşırığı Et</button>`; } tasksHTML += `<div class="task-card"><div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward_amount} ${task.reward_type === 'gems' ? '💎' : 'XP'}</span></div><p class="task-description">${task.description}</p>${btnHTML}</div>`; }); tasksContainer.innerHTML = tasksHTML; }
     function doTask(taskId, link) { if(confirm("Bu tapşırığı etmək üçün kənar səhifəyə yönləndiriləcəksiniz. Davam edilsin?")) { window.open(link, '_blank'); const user = auth.currentUser; db.ref(`/task_submissions/${user.uid}/${taskId}`).set({ status: 'pending', submittedAt: firebase.database.ServerValue.TIMESTAMP }); initializeTasksPage(); } }
-      document.getElementById('withdrawBtn').addEventListener('click', () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); let currentBalance = 0; db.ref('balances/' + user.uid).once('value', snapshot => { const balanceData = snapshot.val(); currentBalance = (balanceData && typeof balanceData.amount === 'number') ? balanceData.amount : 0; const amount = parseFloat(document.getElementById('withdrawAmount').value); const name = document.getElementById('userName').value.trim(); const surname = document.getElementById('userSurname').value.trim(); const card = document.getElementById('cardNumber').value.trim(); if (isNaN(amount) || amount <= 0 || !name || !surname || !card) return alert('Bütün xanaları düzgün doldurun.'); if (card.length !== 16 || isNaN(card)) return alert('Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.'); if (amount > currentBalance) return alert('Balansınızda kifayət qədər vəsait yoxdur.'); const balanceRef = db.ref('balances/' + user.uid); balanceRef.transaction(currentData => { let currentBal = (currentData && currentData.amount) ? currentData.amount : 0; if (amount > currentBal) { return; } return { amount: currentBal - amount }; }, (error, committed, snapshot) => { if (error) { alert('Əməliyyat zamanı xəta baş verdi: ' + error.message); } else if (!committed) { alert('Balansınızda kifayət qədər vəsait yoxdur (əməliyyat ləğv edildi).'); } else { const request = { uid: user.uid, userEmail: user.email, requestData: { name, surname, cardNumber: card, amount }, status: 'pending', createdAt: firebase.database.ServerValue.TIMESTAMP }; db.ref('withdrawals').push(request).then(() => { alert('Sorğunuz göndərildi. Məbləğ balansınızdan çıxıldı və admin təsdiqini gözləyir.'); document.getElementById('notification-badge').style.display = 'flex'; document.getElementById('pulCekModal').style.display = 'none'; ['withdrawAmount', 'userName', 'userSurname', 'cardNumber'].forEach(id => document.getElementById(id).value = ''); }).catch(err => { alert('Sorğu yaradılarkən xəta baş verdi, məbləğ balansınıza geri qaytarılır: ' + err.message); balanceRef.transaction(currentData => ({ amount: ((currentData && currentData.amount) || 0) + amount })); }); } }); }); });
+    document.getElementById('withdrawBtn').addEventListener('click', () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); let currentBalance = 0; db.ref('balances/' + user.uid).once('value', snapshot => { const balanceData = snapshot.val(); currentBalance = (balanceData && typeof balanceData.amount === 'number') ? balanceData.amount : 0; const amount = parseFloat(document.getElementById('withdrawAmount').value); const name = document.getElementById('userName').value.trim(); const surname = document.getElementById('userSurname').value.trim(); const card = document.getElementById('cardNumber').value.trim(); if (isNaN(amount) || amount <= 0 || !name || !surname || !card) return alert('Bütün xanaları düzgün doldurun.'); if (card.length !== 16 || isNaN(card)) return alert('Kart nömrəsi 16 rəqəmdən ibarət olmalıdır.'); if (amount > currentBalance) return alert('Balansınızda kifayət qədər vəsait yoxdur.'); const balanceRef = db.ref('balances/' + user.uid); balanceRef.transaction(currentData => { let currentBal = (currentData && currentData.amount) ? currentData.amount : 0; if (amount > currentBal) { return; } return { amount: currentBal - amount }; }, (error, committed, snapshot) => { if (error) { alert('Əməliyyat zamanı xəta baş verdi: ' + error.message); } else if (!committed) { alert('Balansınızda kifayət qədər vəsait yoxdur (əməliyyat ləğv edildi).'); } else { const request = { uid: user.uid, userEmail: user.email, requestData: { name, surname, cardNumber: card, amount }, status: 'pending', createdAt: firebase.database.ServerValue.TIMESTAMP }; db.ref('withdrawals').push(request).then(() => { alert('Sorğunuz göndərildi. Məbləğ balansınızdan çıxıldı və admin təsdiqini gözləyir.'); document.getElementById('notification-badge').style.display = 'flex'; document.getElementById('pulCekModal').style.display = 'none'; ['withdrawAmount', 'userName', 'userSurname', 'cardNumber'].forEach(id => document.getElementById(id).value = ''); }).catch(err => { alert('Sorğu yaradılarkən xəta baş verdi, məbləğ balansınıza geri qaytarılır: ' + err.message); balanceRef.transaction(currentData => ({ amount: ((currentData && currentData.amount) || 0) + amount })); }); } }); }); });
     function initializeSupportChat(user) { const chatWindow = document.getElementById('chat-window'), chatToggleBtn = document.getElementById('chat-toggle-btn'), chatMessages = document.getElementById('chat-messages'), chatInput = document.getElementById('chat-input'), sendChatBtn = document.getElementById('send-chat-btn'), chatBadge = document.getElementById('chat-notification-badge'); if (listeners['messages']) listeners['messages'].off(); if (listeners['chatState']) listeners['chatState'].off(); chatToggleBtn.onclick = () => { const isHidden = chatWindow.style.display === 'none' || chatWindow.style.display === ''; chatWindow.style.display = isHidden ? 'flex' : 'none'; if (isHidden) { db.ref(`support_chats/${user.uid}/new_message_for_user_count`).set(0); } }; const chatRef = db.ref(`support_chats/${user.uid}`); listeners['chatState'] = chatRef.on('value', (snapshot) => { const count = snapshot.val()?.new_message_for_user_count || 0; chatBadge.textContent = count; chatBadge.style.display = count > 0 ? 'flex' : 'none'; }); chatMessages.innerHTML = ''; const messagesRef = db.ref(`support_chats/${user.uid}/messages`).limitToLast(50); listeners['messages'] = messagesRef.on('child_added', (snapshot) => { const message = snapshot.val(), messageDiv = document.createElement('div'); messageDiv.className = `message ${message.sender === 'admin' ? 'admin' : 'user'}`; messageDiv.textContent = message.text; chatMessages.appendChild(messageDiv); chatMessages.scrollTop = chatMessages.scrollHeight; }); const sendMessage = () => { const text = chatInput.value.trim(); if (text === '') return; const messageData = { text: text, sender: user.uid, timestamp: firebase.database.ServerValue.TIMESTAMP }; db.ref(`support_chats/${user.uid}/messages`).push(messageData); db.ref(`support_chats/${user.uid}`).update({ user_email: user.email, last_message: text, last_updated: firebase.database.ServerValue.TIMESTAMP, new_message_for_admin: true }); chatInput.value = ''; }; sendChatBtn.onclick = sendMessage; chatInput.onkeydown = (event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); } }; }
     document.getElementById('status-icon').addEventListener('click', () => { document.getElementById('statusModal').style.display = 'flex'; });
     function initializeSystemStatus() { const statusRef = db.ref('system_status'); listeners['systemStatus'] = statusRef.on('value', (snapshot) => { const statusListContainer = document.getElementById('status-list'); if (!snapshot.exists()) { statusListContainer.innerHTML = '<p>Sistem vəziyyəti haqqında məlumat yoxdur.</p>'; return; } const statuses = snapshot.val(); let statusHTML = ''; const sortedStatuses = Object.values(statuses).sort((a, b) => a.order - b.order); sortedStatuses.forEach(data => { statusHTML += `<div class="status-item"><div class="status-indicator ${data.state || 'paused'}"></div><div class="status-text"><span class="label">${data.label}</span><span class="description">${data.status_text}</span></div></div>`; }); statusListContainer.innerHTML = statusHTML; }); }
@@ -677,8 +671,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     function createFallingCoin(speed) { const coin = document.createElement('div'); coin.className = 'falling-coin'; coin.textContent = ['🪙', '💰', '💵', '💎'][Math.floor(Math.random() * 4)]; coin.style.left = `${Math.random() * 95}vw`; coin.style.animation = `fall-animation ${Math.random() * 1 + speed}s linear forwards`; coin.onclick = (event) => collectCoin(event.currentTarget); document.body.appendChild(coin); setTimeout(() => coin.remove(), (speed + 1.5) * 1000); }
     function collectCoin(coinElement) { const user = auth.currentUser; if (!user || !coinElement) return; coinElement.remove(); db.ref(`moneyRainEvent/participants/${user.uid}`).transaction((data) => { if (data === null) return { score: 1, displayName: user.displayName }; else return { ...data, score: (data.score || 0) + 1 }; }); }
     function showLeaderboardResult(leaderboardData) { if (!leaderboardData) return; const modal = document.getElementById('leaderboardResultModal'); const listContainer = document.getElementById('leaderboard-result-list'); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); let leaderboardHtml = '<ul>'; if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; modal.style.display = 'flex'; }
-    
-    async function fetchAnnouncements() { const container = document.getElementById('announcements-container'); try { const snapshot = await db.ref('announcements').orderByChild('timestamp').limitToLast(3).once('value'); if (!snapshot.exists()) { container.innerHTML = ''; return; } let announcements = []; snapshot.forEach(child => announcements.push(child.val())); announcements.reverse(); let html = ''; announcements.forEach(ann => { const date = new Date(ann.timestamp).toLocaleDateString('az-AZ'); html += `<div class="announcement-item"><p class="announcement-text">${ann.text}</p><p class="announcement-meta">${date}</p></div>`; }); container.innerHTML = html; } catch (e) { container.innerHTML = ''; } }
+      async function fetchAnnouncements() { const container = document.getElementById('announcements-container'); try { const snapshot = await db.ref('announcements').orderByChild('timestamp').limitToLast(3).once('value'); if (!snapshot.exists()) { container.innerHTML = ''; return; } let announcements = []; snapshot.forEach(child => announcements.push(child.val())); announcements.reverse(); let html = ''; announcements.forEach(ann => { const date = new Date(ann.timestamp).toLocaleDateString('az-AZ'); html += `<div class="announcement-item"><p class="announcement-text">${ann.text}</p><p class="announcement-meta">${date}</p></div>`; }); container.innerHTML = html; } catch (e) { container.innerHTML = ''; } }
     async function fetchAndDisplayHistory(period) {
         const user = auth.currentUser; if (!user) return;
         const listContainer = document.getElementById('notifications-list');
@@ -714,7 +707,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         document.getElementById('notificationsModal').style.display = 'flex';
         fetchAndDisplayHistory('all');
         fetchAnnouncements();
-        localStorage.setItem('lastNotificationCheck', Date.now()); // Bildirişlərə baxıldı
+        localStorage.setItem('lastNotificationCheck', Date.now());
         const badge = document.getElementById('notification-badge');
         badge.textContent = '0';
         badge.style.display = 'none';
@@ -728,88 +721,52 @@ input:checked + .slider:before { transform: translateX(22px); }
     document.getElementById('birjaBtn').addEventListener('click', () => switchPage('birja-page'));
     document.getElementById('shopBtn').addEventListener('click', () => switchPage('shop-page'));
     document.getElementById('settingsBtn').addEventListener('click', () => switchPage('settings-page'));
-      function fetchLeaderboard() { const listContainer = document.getElementById('leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; db.ref('moneyRainEvent/leaderboard').once('value', (snapshot) => { let leaderboardHtml = '<ul>'; if(snapshot.exists()) { const leaderboardData = snapshot.val(); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } } else { leaderboardHtml += "<li>Hələ heç bir nəticə yoxdur.</li>"; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; }); }
+    function fetchLeaderboard() { const listContainer = document.getElementById('leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; db.ref('moneyRainEvent/leaderboard').once('value', (snapshot) => { let leaderboardHtml = '<ul>'; if(snapshot.exists()) { const leaderboardData = snapshot.val(); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } } else { leaderboardHtml += "<li>Hələ heç bir nəticə yoxdur.</li>"; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; }); }
     
     async function showUserProfileModal(uid) {
         const modal = document.getElementById('userProfileModal');
         const contentContainer = document.getElementById('profile-modal-content');
         contentContainer.innerHTML = '<p>Yüklənir...</p>';
         modal.style.display = 'flex';
-
         try {
-            const [userSnapshot, levelSnapshot, inventorySnapshot, settingsSnapshot] = await Promise.all([
-                db.ref(`/users/${uid}`).once('value'),
-                db.ref(`/user_levels/${uid}`).once('value'),
-                db.ref(`/user_inventory/${uid}`).once('value'),
-                db.ref(`/user_profile_settings/${uid}`).once('value')
-            ]);
-
+            const [userSnapshot, levelSnapshot, inventorySnapshot, settingsSnapshot] = await Promise.all([ db.ref(`/users/${uid}`).once('value'), db.ref(`/user_levels/${uid}`).once('value'), db.ref(`/user_inventory/${uid}`).once('value'), db.ref(`/user_profile_settings/${uid}`).once('value') ]);
             const userData = userSnapshot.val() || {};
             const levelData = levelSnapshot.val() || { level: 1 };
             const inventoryData = inventorySnapshot.val() || {};
             const settingsData = settingsSnapshot.val() || {};
-
             let frameClass = '';
             if (settingsData.equipped_frame === 'gold_frame') frameClass = 'frame-gold';
             if (settingsData.equipped_frame === 'silver_frame') frameClass = 'frame-silver';
-
             let inventoryHTML = '<h4>Alınmış Əşyalar:</h4>';
             const itemIds = Object.keys(inventoryData);
-
             if (itemIds.length > 0) {
                 inventoryHTML += '<div class="inventory-grid">';
                 const itemPromises = itemIds.map(id => db.ref(`/shop_items/${id}`).once('value'));
                 const itemSnapshots = await Promise.all(itemPromises);
-                
-                itemSnapshots.forEach(itemSnap => {
-                    if (itemSnap.exists()) {
-                        const item = itemSnap.val();
-                        inventoryHTML += `<div class="inventory-item"><div class="inventory-item-icon">${item.icon}</div><div>${item.name}</div></div>`;
-                    }
-                });
+                itemSnapshots.forEach(itemSnap => { if (itemSnap.exists()) { const item = itemSnap.val(); inventoryHTML += `<div class="inventory-item"><div class="inventory-item-icon">${item.icon}</div><div>${item.name}</div></div>`; } });
                 inventoryHTML += '</div>';
-            } else {
-                inventoryHTML += '<p>İstifadəçinin heç bir əşyası yoxdur.</p>';
-            }
-
-            const modalHTML = `
-                <div class="profile-modal-header">
-                    <img src="${userData.photoURL || 'https://i.imgur.com/3YQ5h0Q.png'}" alt="Avatar" class="profile-modal-avatar ${frameClass}">
-                    <h3>${userData.displayName || 'Naməlum'}</h3>
-                    <p>Səviyyə: ${levelData.level}</p>
-                </div>
-                <div class="profile-modal-inventory">${inventoryHTML}</div>`;
+            } else { inventoryHTML += '<p>İstifadəçinin heç bir əşyası yoxdur.</p>'; }
+            const modalHTML = ` <div class="profile-modal-header"> <img src="${userData.photoURL || 'https://i.imgur.com/3YQ5h0Q.png'}" alt="Avatar" class="profile-modal-avatar ${frameClass}"> <h3>${userData.displayName || 'Naməlum'}</h3> <p>Səviyyə: ${levelData.level}</p> </div> <div class="profile-modal-inventory">${inventoryHTML}</div>`;
             contentContainer.innerHTML = modalHTML;
-
-        } catch (error) {
-            console.error("Profil məlumatları çəkilərkən xəta:", error);
-            contentContainer.innerHTML = '<p>Məlumatları yükləmək mümkün olmadı.</p>';
-        }
+        } catch (error) { console.error("Profil məlumatları çəkilərkən xəta:", error); contentContainer.innerHTML = '<p>Məlumatları yükləmək mümkün olmadı.</p>'; }
     }
     
     async function fetchLevelLeaderboard() { 
-        const listContainer = document.getElementById('level-leaderboard-list'); 
-        listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; 
+        const listContainer = document.getElementById('level-leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; 
         const levelsSnapshot = await db.ref('user_levels').orderByChild('level').limitToLast(50).once('value'); 
         if (!levelsSnapshot.exists()) { listContainer.innerHTML = "<ul><li>Sıralama üçün kifayət qədər istifadəçi yoxdur.</li></ul>"; return; } 
-        let users = []; 
-        levelsSnapshot.forEach(child => { users.push({ uid: child.key, ...child.val() }); }); 
+        let users = []; levelsSnapshot.forEach(child => { users.push({ uid: child.key, ...child.val() }); }); 
         users.sort((a, b) => b.level === a.level ? b.xp - a.xp : b.level - a.level); 
         const userInfoPromises = users.map(user => Promise.all([ db.ref(`users/${user.uid}`).once('value'), db.ref(`/user_profile_settings/${user.uid}/equipped_frame`).once('value') ]) ); 
         const usersInfo = await Promise.all(userInfoPromises); 
         let listHTML = '<ul>'; 
         users.forEach((user, index) => { 
-            const userData = usersInfo[index][0].val() || {}; 
-            const frameId = usersInfo[index][1].val(); 
-            let frameClass = ''; 
-            if (frameId === 'gold_frame') frameClass = 'frame-gold'; 
-            if (frameId === 'silver_frame') frameClass = 'frame-silver'; 
-            const photoURL = userData.photoURL || 'https://i.imgur.com/3YQ5h0Q.png'; 
-            const displayName = userData.displayName || "Naməlum"; 
+            const userData = usersInfo[index][0].val() || {}; const frameId = usersInfo[index][1].val(); let frameClass = ''; 
+            if (frameId === 'gold_frame') frameClass = 'frame-gold'; if (frameId === 'silver_frame') frameClass = 'frame-silver'; 
+            const photoURL = userData.photoURL || 'https://i.imgur.com/3YQ5h0Q.png'; const displayName = userData.displayName || "Naməlum"; 
             listHTML += `<li onclick="showUserProfileModal('${user.uid}')"><div class="leaderboard-item-user"><img src="${photoURL}" class="leaderboard-avatar ${frameClass}"><span><b>#${index + 1}</b> ${displayName}</span></div><span>Level ${user.level} (${user.xp} XP)</span></li>`; 
         }); 
-        listHTML += '</ul>'; 
-        listContainer.innerHTML = listHTML; 
+        listHTML += '</ul>'; listContainer.innerHTML = listHTML; 
     }
     document.getElementById('leaderboard-tab-rain').addEventListener('click', function() { this.classList.add('active'); document.getElementById('leaderboard-tab-level').classList.remove('active'); document.getElementById('leaderboard-rain-content').style.display = 'block'; document.getElementById('leaderboard-level-content').style.display = 'none'; fetchLeaderboard(); });
     document.getElementById('leaderboard-tab-level').addEventListener('click', function() { this.classList.add('active'); document.getElementById('leaderboard-tab-rain').classList.remove('active'); document.getElementById('leaderboard-rain-content').style.display = 'none'; document.getElementById('leaderboard-level-content').style.display = 'block'; fetchLevelLeaderboard(); });
@@ -821,59 +778,25 @@ input:checked + .slider:before { transform: translateX(22px); }
         
         listeners['balance'] = db.ref('balances/' + uid).on('value', snapshot => {
             const newBalance = snapshot.val()?.amount || 0;
-            const balanceElements = [
-                document.getElementById('balance'),
-                document.getElementById('header-azn-balance').querySelector('span')
-            ];
-            
+            const mainBalanceElement = document.getElementById('balance');
+            const headerBalanceElement = document.getElementById('header-azn-balance')?.querySelector('span');
+
             if (Math.abs(displayedBalance - newBalance) > 0.001) {
-                animateBalanceUpdate(balanceElements, displayedBalance, newBalance);
+                animateBalanceUpdate(mainBalanceElement, displayedBalance, newBalance);
+                animateBalanceUpdate(headerBalanceElement, displayedBalance, newBalance);
                 displayedBalance = newBalance;
             } else {
-                 balanceElements.forEach(el => { if(el) el.textContent = newBalance.toFixed(2) });
+                if(mainBalanceElement) mainBalanceElement.textContent = newBalance.toFixed(2);
+                if(headerBalanceElement) headerBalanceElement.textContent = newBalance.toFixed(2);
             }
-            
             const birjaEl = document.getElementById('birjaAznBalance');
             if(birjaEl) birjaEl.textContent = `${newBalance.toFixed(2)} AZN`;
         });
 
-        listeners['coins'] = db.ref('user_coins/' + uid).on('value', snapshot => {
-            const coinAmount = snapshot.val()?.amount || 0;
-            const coinText = coinAmount.toFixed(2);
-            const headerCoinEl = document.getElementById('header-coin-balance');
-            const birjaCoinEl = document.getElementById('birjaUserCoinBalance');
-            if (headerCoinEl) headerCoinEl.querySelector('span').textContent = coinText;
-            if (birjaCoinEl) birjaCoinEl.textContent = `${coinText} ${currentCoinData.name || 'Coin'}`;
-        });
-
-        listeners['gems'] = db.ref('user_gems/' + uid).on('value', snapshot => {
-            const gemEl = document.getElementById('header-gem-balance');
-            if(gemEl) gemEl.querySelector('span').textContent = snapshot.val()?.amount || 0;
-        });
-
-        listeners['level'] = db.ref('user_levels/' + uid).on('value', snapshot => {
-            const levelData = snapshot.val() || {level: 1, xp: 0};
-            const nextLevelXp = levelXpRequirements[levelData.level] || (10000 + (levelData.level - 9) * 5000);
-            const prevLevelXp = levelXpRequirements[levelData.level - 1] || 0;
-            const xpInLevel = nextLevelXp - prevLevelXp;
-            const currentXpInLevel = levelData.xp - prevLevelXp;
-            const progress = (xpInLevel > 0) ? Math.min(100, (currentXpInLevel / xpInLevel) * 100) : 0;
-            document.getElementById('level-start-text').textContent = `Level ${levelData.level}`;
-            document.getElementById('level-xp-text').textContent = `${levelData.xp} / ${nextLevelXp} XP`;
-            document.getElementById('level-progress-bar').style.width = `${progress}%`;
-        });
-
-        listeners['equippedItems'] = db.ref(`/user_profile_settings/${uid}`).on('value', snapshot => {
-            const settings = snapshot.val() || {};
-            const bagIcon = document.getElementById('main-bag-icon');
-            if(settings.equipped_bag_skin) {
-                db.ref(`/shop_items/${settings.equipped_bag_skin}/icon`).once('value', icon => {
-                    if(icon.exists() && bagIcon) bagIcon.textContent = icon.val();
-                });
-            } else {
-                if(bagIcon) bagIcon.textContent = '💰';
-            }
-        });
+        listeners['coins'] = db.ref('user_coins/' + uid).on('value', snapshot => { const coinAmount = snapshot.val()?.amount || 0; const coinText = coinAmount.toFixed(2); const headerCoinEl = document.getElementById('header-coin-balance'); const birjaCoinEl = document.getElementById('birjaUserCoinBalance'); if (headerCoinEl) headerCoinEl.querySelector('span').textContent = coinText; if (birjaCoinEl) birjaCoinEl.textContent = `${coinText} ${currentCoinData.name || 'Coin'}`; });
+        listeners['gems'] = db.ref('user_gems/' + uid).on('value', snapshot => { const gemEl = document.getElementById('header-gem-balance'); if(gemEl) gemEl.querySelector('span').textContent = snapshot.val()?.amount || 0; });
+        listeners['level'] = db.ref('user_levels/' + uid).on('value', snapshot => { const levelData = snapshot.val() || {level: 1, xp: 0}; const nextLevelXp = levelXpRequirements[levelData.level] || (10000 + (levelData.level - 9) * 5000); const prevLevelXp = levelXpRequirements[levelData.level - 1] || 0; const xpInLevel = nextLevelXp - prevLevelXp; const currentXpInLevel = levelData.xp - prevLevelXp; const progress = (xpInLevel > 0) ? Math.min(100, (currentXpInLevel / xpInLevel) * 100) : 0; document.getElementById('level-start-text').textContent = `Level ${levelData.level}`; document.getElementById('level-xp-text').textContent = `${levelData.xp} / ${nextLevelXp} XP`; document.getElementById('level-progress-bar').style.width = `${progress}%`; });
+        listeners['equippedItems'] = db.ref(`/user_profile_settings/${uid}`).on('value', snapshot => { const settings = snapshot.val() || {}; const bagIcon = document.getElementById('main-bag-icon'); if(settings.equipped_bag_skin) { db.ref(`/shop_items/${settings.equipped_bag_skin}/icon`).once('value', icon => { if(icon.exists() && bagIcon) bagIcon.textContent = icon.val(); }); } else { if(bagIcon) bagIcon.textContent = '💰'; } });
     }
 
     function detachAllListeners() { for (const key in listeners) { if (listeners[key]) { listeners[key].off(); } } listeners = {}; }
