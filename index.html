@@ -3,478 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oyun Paneli</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>Admin Panel</title>
     <style>
-                :root {
-            --bg-dark: #0f0c29;
-            --bg-medium: #24243e;
-            --card: rgba(255, 255, 255, 0.05);
-            --glass: rgba(255, 255, 255, 0.1);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --text-light: #f8fafc;
-            --text-muted: #a9a9a9;
-            --accent-purple: #8b5cf6;
-            --accent-green: #22c55e;
-            --accent-yellow: #f59e0b;
-        }
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, var(--bg-dark), var(--bg-medium));
-            color: var(--text-light);
-            min-height: 100vh;
-            padding-top: 70px; /* Header hündürlüyü qədər */
-            padding-bottom: 80px; /* Footer hündürlüyü qədər */
-        }
-                .top-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 10px;
-            background-color: var(--bg-medium);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 100;
-        }
-        .header-balance {
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        .header-balance i {
-            color: var(--accent-yellow);
-            margin-right: 5px;
-        }
-        footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--bg-medium);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 5px 0;
-            z-index: 100;
-        }
-        .nav-item {
-            color: var(--text-muted);
-            text-decoration: none;
-            text-align: center;
-            font-size: 0.75rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .nav-item span {
-            font-size: 1.5rem;
-            display: block;
-        }
-        .nav-item.active {
-            color: var(--accent-purple);
-            transform: translateY(-5px);
-        }
-                .main-container {
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .page {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .page.active {
-            display: block;
-        }
-        .page-header {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-                .earnings-section {
-            background: var(--card);
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #earnings-amount {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--accent-green);
-            text-shadow: 0 0 10px var(--accent-green);
-        }
-        #collect-earnings-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background-color: var(--accent-green);
-            color: white;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: all 0.2s;
-        }
-        #collect-earnings-btn:hover {
-            box-shadow: 0 0 15px var(--accent-green);
-        }
-        .my-cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 15px;
-        }
-        .my-card {
-            background: var(--glass);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .my-card-icon { font-size: 3rem; }
-        .my-card-name { font-weight: 600; margin: 5px 0; }
-        .my-card-rate { font-size: 0.8rem; color: var(--accent-green); }
-                .shop-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .shop-item {
-            background: var(--card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-        }
-        .shop-item-icon { font-size: 4rem; }
-        .shop-item-name { font-weight: 600; font-size: 1.1rem; margin: 10px 0; }
-        .shop-item-rate { font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px; }
-        .buy-btn {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background-color: var(--accent-purple);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .buy-btn:hover {
-            box-shadow: 0 0 15px var(--accent-purple);
-        }
-        .leaderboard-list {
-            list-style: none;
-        }
-        .leaderboard-list li {
-            background: var(--card);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 1.1rem;
-        }
-                .profile-card {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-        }
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent-purple);
-            margin-bottom: 15px;
-        }
-        .profile-name { font-size: 1.5rem; font-weight: bold; }
-        .profile-email { color: var(--text-muted); margin-top: 5px; margin-bottom: 20px; }
-        #logout-btn {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--accent-yellow);
-            border-radius: 8px;
-            background: transparent;
-            color: var(--accent-yellow);
-            font-weight: bold;
-            cursor: pointer;
-        }
+        body { font-family: sans-serif; background-color: #f0f2f5; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #1a2c50; }
+        #login-screen { text-align: center; margin-top: 100px; }
+        #admin-panel { display: none; }
+        .tabs { display: flex; border-bottom: 2px solid #ccc; margin-bottom: 20px; }
+        .tab { padding: 10px 20px; cursor: pointer; border-radius: 6px 6px 0 0; }
+        .tab.active { background-color: #1a2c50; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .form-section { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #eee; }
+        .form-section h3 { margin-top: 0; }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        #logoutBtn { background-color: #dc3545; position: absolute; top: 20px; right: 20px; width: auto; padding: 10px 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn-approve { background-color: #28a745; }
+        .btn-reject { background-color: #dc3545; }
     </style>
 </head>
 <body>
-    <header class="top-header">
-        <div class="header-balance">
-            <i class="fa-solid fa-coins"></i>
-            <span id="user-coin-balance">0</span>
-        </div>
-        <div class="header-balance">
-            <i class="fa-solid fa-gem"></i>
-            <span id="user-gem-balance">0</span>
-        </div>
-    </header>
 
-    <main class="main-container">
-                <div id="home-page" class="page active">
-            <div class="earnings-section">
-                <p style="color: var(--text-muted);">Toplanacaq Qazanc</p>
-                <div><span id="earnings-amount">0</span> <i class="fa-solid fa-coins"></i></div>
-                <button id="collect-earnings-btn">QAZANCI TOPLA</button>
+    <div class="container">
+        <div id="login-screen">
+            <h1>Admin Panel Giriş</h1>
+            <p>Zəhmət olmasa, admin hesabı ilə daxil olun.</p>
+            <button id="loginBtn">Google ilə Daxil Ol</button>
+        </div>
+
+        <div id="admin-panel">
+            <button id="logoutBtn">Çıxış</button>
+            <h1>İdarəetmə Paneli</h1>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="openTab('mining')">Minik Kartları</div>
+                <div class="tab" onclick="openTab('tasks')">Tapşırıqlar</div>
             </div>
-            <h3 style="margin-bottom: 15px;">Mənim Kartlarım</h3>
-            <div id="my-cards-grid" class="my-cards-grid">
-                <p>Heç bir kartınız yoxdur. Mağazadan kart ala bilərsiniz.</p>
-            </div>
+                        <div id="mining" class="tab-content active">
+                <h2>Minik Kartları İdarəetmə</h2>
+
+                <div class="form-section">
+                    <h3>Yeni Minik Kartı Yarat</h3>
+                    <input type="text" id="cardId" placeholder="Kart ID (məs: gold_miner)">
+                    <input type="text" id="cardName" placeholder="Kartın Adı (məs: Qızıl Mədənçisi)">
+                    <input type="text" id="cardImageUrl" placeholder="Kartın Şəkil URL-i">
+                    <button onclick="createMiningCard()">Kart Yarat</button>
                 </div>
-                        <div id="shop-page" class="page">
-            <h1 class="page-header">Mağaza</h1>
-            <div id="shop-grid" class="shop-grid">
+
+                <div class="form-section">
+                    <h3>Kart Səviyyə Parametrləri</h3>
+                    <p>Mövcud kart üçün səviyyə, qiymət və saat karını daxil edin.</p>
+                    <input type="text" id="ruleCardId" placeholder="Səviyyə əlavə ediləcək Kart ID">
+                    <input type="number" id="cardLevel" placeholder="Səviyyə (məs: 1)">
+                    <input type="number" id="levelCost" placeholder="Bu səviyyəyə keçid qiyməti (Coin)">
+                    <input type="number" id="levelRate" placeholder="Bu səviyyənin verdiyi Saat Karı">
+                    <button onclick="setCardLevelRule()">Səviyyəni Təyin Et</button>
                 </div>
-        </div>
+                        </div>
+                                    <div id="tasks" class="tab-content">
+                <h2>Tapşırıqlar İdarəetmə</h2>
 
-        <div id="leaderboard-page" class="page">
-            <h1 class="page-header">Liderlər Cədvəli</h1>
-            <ul id="leaderboard-list" class="leaderboard-list">
-                </ul>
-        </div>
+                <div class="form-section">
+                    <h3>Yeni Tapşırıq Yarat</h3>
+                    <input type="text" id="taskTitle" placeholder="Tapşırıq Başlığı">
+                    <input type="text" id="taskDesc" placeholder="Tapşırıq Açıqlaması">
+                    <input type="text" id="taskLink" placeholder="Tapşırıq Linki (URL)">
+                    <select id="taskRewardType">
+                        <option value="coin">Coin</option>
+                        <option value="gems">Gems</option>
+                        <option value="xp">XP</option>
+                    </select>
+                    <input type="number" id="taskRewardAmount" placeholder="Mükafat Miqdarı">
+                    <button onclick="createTask()">Tapşırıq Yarat</button>
+                </div>
 
-        <div id="profile-page" class="page">
-            <h1 class="page-header">Profil</h1>
-            <div class="profile-card">
-                <img id="profile-avatar" src="https://i.imgur.com/3YQ5h0Q.png" alt="Avatar" class="profile-avatar">
-                <h2 id="profile-name">Yüklənir...</h2>
-                <p id="profile-email">Yüklənir...</p>
-                <button id="logout-btn">Çıxış Et</button>
+                <div class="form-section">
+                    <h3>Gözləyən Tapşırıqlar</h3>
+                    <table id="submissionsTable">
+                        <thead>
+                            <tr>
+                                <th>İstifadəçi ID</th>
+                                <th>Tapşırıq ID</th>
+                                <th>Tarix</th>
+                                <th>Əməliyyat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-    </main>
 
-    <footer>
-        <a class="nav-item active" data-page="home-page"><span><i class="fa-solid fa-house"></i></span>Əsas</a>
-        <a class="nav-item" data-page="shop-page"><span><i class="fa-solid fa-store"></i></span>Mağaza</a>
-        <a class="nav-item" data-page="leaderboard-page"><span><i class="fa-solid fa-ranking-star"></i></span>Liderlər</a>
-        <a class="nav-item" data-page="profile-page"><span><i class="fa-solid fa-user"></i></span>Profil</a>
-    </footer>
+        </div>
+    </div>
         <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
+
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw",
-            authDomain: "niceuc-e5986.firebaseapp.com",
-            databaseURL: "https://niceuc-e5986-default-rtdb.firebaseio.com",
-            projectId: "niceuc-e5986",
-            appId: "1:242221260650:web:d140153a2167c4738dcf13"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw", authDomain: "niceuc-e5986.firebaseapp.com", databaseURL: "https://niceuc-e5986-default-rtdb.firebaseio.com", projectId: "niceuc-e5986", appId: "1:242221260650:web:d140153a2167c4738dcf13" };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let currentUser = null;
-        let earningsInterval = null; // Qazancı hər saniyə yeniləmək üçün
-                auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUser = user;
-                loadUserData(user.uid);
-                loadShop();
-                loadLeaderboard();
+        // --- Giriş və Təhlükəsizlik ---
+        const loginScreen = document.getElementById('login-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        
+        // !!! VACİB: Bura yalnız adminlərin istifadəçi ID-lərini (UID) əlavə edin.
+        const ADMIN_UIDS = ["ADMIN_1_UID_BURA_YAZILIR", "ADMIN_2_UID_BURA_YAZILIR"];
+
+        auth.onAuthStateChanged(user => {
+            if (user && ADMIN_UIDS.includes(user.uid)) {
+                // İstifadəçi admindirsə paneli göstər
+                loginScreen.style.display = 'none';
+                adminPanel.style.display = 'block';
+                loadSubmissions();
             } else {
-                // Giriş edilməyibsə, Google ilə giriş düyməsi göstərilə bilər.
-                // Bu hissəni öz proyektinizə uyğunlaşdırın.
-                document.body.innerHTML = `<div style="text-align:center; padding-top: 50px;"><h1>Xoş Gəlmisiniz!</h1><p>Davam etmək üçün daxil olun.</p></div>`;
+                // İstifadəçi admin deyilsə və ya giriş etməyibsə, login ekranını göstər
+                loginScreen.style.display = 'block';
+                adminPanel.style.display = 'none';
+                if (user) {
+                    // Admin olmayan hesab çıxış etsin
+                    auth.signOut();
+                }
             }
         });
 
-        async function loadUserData(uid) {
-            const userRef = db.ref(`game_users/${uid}`);
-            userRef.on('value', async (snapshot) => {
-                let userData = snapshot.val();
-                if (!userData) {
-                    userData = {
-                        displayName: currentUser.displayName, email: currentUser.email, photoURL: currentUser.photoURL,
-                        coins: 100, gems: 0, lastCollectedTime: Date.now(), cards: {}
-                    };
-                    await userRef.set(userData);
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider);
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        function openTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+                // --- Minik Kart Funksiyaları ---
+        function createMiningCard() {
+            const cardId = document.getElementById('cardId').value.trim();
+            const name = document.getElementById('cardName').value.trim();
+            const imageUrl = document.getElementById('cardImageUrl').value.trim();
+            if (!cardId || !name || !imageUrl) return alert('Bütün xanaları doldurun.');
+
+            db.ref('mining_cards/' + cardId).set({ name, imageUrl })
+                .then(() => alert(`'${name}' kartı uğurla yaradıldı!`))
+                .catch(err => alert('Xəta: ' + err.message));
+        }
+
+        function setCardLevelRule() {
+            const cardId = document.getElementById('ruleCardId').value.trim();
+            const level = document.getElementById('cardLevel').value;
+            const cost = parseInt(document.getElementById('levelCost').value);
+            const rate = parseInt(document.getElementById('levelRate').value);
+            if (!cardId || !level || isNaN(cost) || isNaN(rate)) return alert('Bütün xanaları düzgün doldurun.');
+
+            db.ref(`card_level_rules/${cardId}/${level}`).set({ cost: cost, hourly_rate_provided: rate })
+                .then(() => alert(`${cardId} kartının ${level}-ci səviyyəsi təyin edildi!`))
+                .catch(err => alert('Xəta: ' + err.message));
+        }
+
+        // --- Tapşırıq Funksiyaları ---
+        function createTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDesc').value.trim();
+            const link = document.getElementById('taskLink').value.trim();
+            const reward_type = document.getElementById('taskRewardType').value;
+            const reward_amount = parseInt(document.getElementById('taskRewardAmount').value);
+            if (!title || !description || !link || isNaN(reward_amount)) return alert('Bütün xanaları doldurun.');
+
+            const newTaskRef = db.ref('tasks').push();
+            newTaskRef.set({ title, description, link, reward_type, reward_amount })
+                .then(() => alert('Tapşırıq uğurla yaradıldı!'))
+                .catch(err => alert('Xəta: ' + err.message));
+        }
+
+        function loadSubmissions() {
+            const submissionsRef = db.ref('task_submissions').orderByChild('status').equalTo('pending');
+            submissionsRef.on('value', snapshot => {
+                const tableBody = document.getElementById('submissionsTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+                if (!snapshot.exists()) {
+                    tableBody.innerHTML = '<tr><td colspan="4">Gözləyən tapşırıq yoxdur.</td></tr>';
+                    return;
                 }
-                
-                document.getElementById('user-coin-balance').textContent = Math.floor(userData.coins);
-                document.getElementById('user-gem-balance').textContent = userData.gems;
-                
-                document.getElementById('profile-avatar').src = userData.photoURL;
-                document.getElementById('profile-name').textContent = userData.displayName;
-                document.getElementById('profile-email').textContent = userData.email;
-
-                if (earningsInterval) clearInterval(earningsInterval);
-                earningsInterval = setInterval(() => updateEarningsDisplay(uid), 1000);
-
-                const cardDetails = await getCardDetails();
-                renderMyCards(userData.cards, cardDetails);
+                snapshot.forEach(userSubmissions => {
+                    const uid = userSubmissions.key;
+                    userSubmissions.forEach(taskSubmission => {
+                        if (taskSubmission.val().status === 'pending') {
+                            const taskId = taskSubmission.key;
+                            const submissionData = taskSubmission.val();
+                            const date = new Date(submissionData.submittedAt).toLocaleString('az-AZ');
+                            const row = tableBody.insertRow();
+                            row.innerHTML = `
+                                <td>${uid.substring(0, 10)}...</td>
+                                <td>${taskId}</td>
+                                <td>${date}</td>
+                                <td>
+                                    <button class="btn-approve" onclick="approveSubmission('${uid}', '${taskId}')">Təsdiqlə</button>
+                                    <button class="btn-reject" onclick="rejectSubmission('${uid}', '${taskId}')">Rədd Et</button>
+                                </td>
+                            `;
+                        }
+                    });
+                });
             });
-        }
-
-        function getCardDetails() {
-            return db.ref('game_cards').once('value').then(snap => snap.val() || {});
-        }
-
-        async function updateEarningsDisplay(uid) {
-            const userSnap = await db.ref(`game_users/${uid}`).once('value');
-            const userData = userSnap.val();
-            if (!userData) return;
-            
-            const cardDetails = await getCardDetails();
-
-            let totalHourlyRate = 0;
-            if (userData.cards) {
-                for (const cardId in userData.cards) {
-                    const userCard = userData.cards[cardId];
-                    const cardInfo = cardDetails[cardId];
-                    if (cardInfo) {
-                        totalHourlyRate += cardInfo.rate * userCard.count;
-                    }
-                }
-            }
-            const timeDiffMs = Date.now() - userData.lastCollectedTime;
-            const timeDiffHours = timeDiffMs / 3600000;
-            const earnedCoins = timeDiffHours * totalHourlyRate;
-            document.getElementById('earnings-amount').textContent = Math.floor(earnedCoins);
-        }
-
-        async function collectEarnings() {
-            if (!currentUser) return;
-            const uid = currentUser.uid;
-            
-            const userSnap = await db.ref(`game_users/${uid}`).once('value');
-            const userData = userSnap.val();
-            const cardDetails = await getCardDetails();
-            let totalHourlyRate = 0;
-            if (userData.cards) {
-                for (const cardId in userData.cards) {
-                    totalHourlyRate += (cardDetails[cardId]?.rate || 0) * userData.cards[cardId].count;
-                }
-            }
-            const timeDiffMs = Date.now() - userData.lastCollectedTime;
-            const timeDiffHours = timeDiffMs / 3600000;
-            const earnedCoins = Math.floor(timeDiffHours * totalHourlyRate);
-
-            if (earnedCoins > 0) {
-                const updates = {};
-                updates[`/game_users/${uid}/coins`] = firebase.database.ServerValue.increment(earnedCoins);
-                updates[`/game_users/${uid}/lastCollectedTime`] = Date.now();
-                await db.ref().update(updates);
-                alert(`${earnedCoins} coin toplandı!`);
-            } else {
-                alert("Toplanacaq qazanc yoxdur.");
-            }
-        }
-                async function loadShop() {
-            const cards = await getCardDetails();
-            const shopGrid = document.getElementById('shop-grid');
-            shopGrid.innerHTML = '';
-            for (const cardId in cards) {
-                const card = cards[cardId];
-                shopGrid.innerHTML += `
-                    <div class="shop-item">
-                        <div class="shop-item-icon">${card.icon}</div>
-                        <h3 class="shop-item-name">${card.name}</h3>
-                        <p class="shop-item-rate">+${card.rate} <i class="fa-solid fa-coins"></i>/saat</p>
-                        <button class="buy-btn" onclick="buyCard('${cardId}')">
-                            <i class="fa-solid fa-coins"></i> ${card.price}
-                        </button>
-                    </div>
-                `;
-            }
         }
         
-        async function buyCard(cardId) {
-            if (!currentUser) return;
-            const uid = currentUser.uid;
-            const cardRef = db.ref(`game_cards/${cardId}`);
-            const userRef = db.ref(`game_users/${uid}`);
-            const cardSnap = await cardRef.once('value');
-            const userSnap = await userRef.once('value');
-            const cardData = cardSnap.val();
-            const userData = userSnap.val();
-
-            if (userData.coins >= cardData.price) {
-                const updates = {};
-                updates[`coins`] = firebase.database.ServerValue.increment(-cardData.price);
-                updates[`cards/${cardId}/count`] = firebase.database.ServerValue.increment(1);
-                await userRef.update(updates);
-                alert(`'${cardData.name}' kartı uğurla alındı!`);
-            } else {
-                alert("Kifayət qədər coin yoxdur!");
+        async function approveSubmission(uid, taskId) {
+            const taskSnapshot = await db.ref(`tasks/${taskId}`).once('value');
+            if (!taskSnapshot.exists()) return alert('Tapşırıq tapılmadı.');
+            
+            const task = taskSnapshot.val();
+            const updates = {};
+            
+            // Mükafatı ver
+            if (task.reward_type === 'coin') {
+                updates[`/user_coins/${uid}/amount`] = firebase.database.ServerValue.increment(task.reward_amount);
+            } else if (task.reward_type === 'gems') {
+                updates[`/user_gems/${uid}/amount`] = firebase.database.ServerValue.increment(task.reward_amount);
             }
+            // XP üçün də bura əlavə edilə bilər
+            
+            // Statusu yenilə
+            updates[`/task_submissions/${uid}/${taskId}/status`] = 'completed';
+            
+            db.ref().update(updates)
+                .then(() => alert(`${uid} üçün tapşırıq təsdiqləndi.`))
+                .catch(err => alert('Xəta: ' + err.message));
         }
 
-        function renderMyCards(userCards, cardDetails) {
-            const grid = document.getElementById('my-cards-grid');
-            grid.innerHTML = '';
-            if (!userCards || Object.keys(userCards).length === 0) {
-                grid.innerHTML = '<p>Heç bir kartınız yoxdur. Mağazadan kart ala bilərsiniz.</p>';
-                return;
-            }
-            for (const cardId in userCards) {
-                const cardInfo = cardDetails[cardId];
-                const userCard = userCards[cardId];
-                if (cardInfo) {
-                    grid.innerHTML += `
-                        <div class="my-card">
-                            <div class="my-card-icon">${cardInfo.icon}</div>
-                            <div class="my-card-name">${cardInfo.name} (x${userCard.count})</div>
-                            <div class="my-card-rate">+${cardInfo.rate * userCard.count} <i class="fa-solid fa-coins"></i>/saat</div>
-                        </div>
-                    `;
-                }
-            }
+        function rejectSubmission(uid, taskId) {
+            db.ref(`/task_submissions/${uid}/${taskId}/status`).set('rejected')
+                .then(() => alert(`${uid} üçün tapşırıq rədd edildi.`))
+                .catch(err => alert('Xəta: ' + err.message));
         }
 
-        async function loadLeaderboard() {
-            const usersRef = db.ref('game_users').orderByChild('coins').limitToLast(10);
-            const snapshot = await usersRef.once('value');
-            const users = snapshot.val();
-            const list = document.getElementById('leaderboard-list');
-            list.innerHTML = '';
-            if (!users) return;
-
-            const sortedUsers = Object.values(users).sort((a,b) => b.coins - a.coins);
-            sortedUsers.forEach(user => {
-                list.innerHTML += `<li><span>${user.displayName}</span><span>${Math.floor(user.coins)} <i class="fa-solid fa-coins"></i></span></li>`;
-            });
-        }
-
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', () => {
-                navItems.forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-                const pageId = item.getAttribute('data-page');
-                showPage(pageId);
-            });
-        });
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-
-        document.getElementById('collect-earnings-btn').addEventListener('click', collectEarnings);
-        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
     </script>
 </body>
 </html>
