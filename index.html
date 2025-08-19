@@ -674,7 +674,61 @@ input:checked + .slider:before { transform: translateX(22px); }
     const accordions = document.getElementsByClassName("accordion");
     for (let i = 0; i < accordions.length; i++) { accordions[i].addEventListener("click", function() { this.classList.toggle("active"); const panel = this.nextElementSibling; if (panel.style.maxHeight) { panel.style.maxHeight = null; } else { panel.style.maxHeight = panel.scrollHeight + "px"; } }); }
     
-    function attachAllListeners(uid) { detachAllListeners(); let lastKnownBalance = 0; listeners['balance'] = db.ref('balances/' + uid).on('value', snapshot => { const newBalance = snapshot.val()?.amount || 0; const balanceElement = document.getElementById('balance'); document.getElementById('header-azn-balance').querySelector('span').textContent = newBalance.toFixed(2); document.getElementById('birjaAznBalance').textContent = `${newBalance.toFixed(2)} AZN`; if (newBalance > lastKnownBalance && lastKnownBalance !== 0) { animateCountUp(balanceElement, lastKnownBalance, newBalance, 1200); } else { balanceElement.textContent = newBalance.toFixed(2); } lastKnownBalance = newBalance; }); listeners['coins'] = db.ref('user_coins/' + uid).on('value', snapshot => { const coinAmount = snapshot.val()?.amount || 0; document.getElementById('header-coin-balance').querySelector('span').textContent = coinAmount.toFixed(2); document.getElementById('birjaUserCoinBalance').textContent = `${coinAmount.toFixed(2)} ${currentCoinData.name || 'Coin'}`; }); listeners['gems'] = db.ref('user_gems/' + uid).on('value', snapshot => { document.getElementById('header-gem-balance').querySelector('span').textContent = snapshot.val()?.amount || 0; }); listeners['level'] = db.ref('user_levels/' + uid).on('value', snapshot => { const levelData = snapshot.val() || {level: 1, xp: 0}; const nextLevelXp = levelXpRequirements[levelData.level] || (10000 + (levelData.level - 9) * 5000); const prevLevelXp = levelXpRequirements[levelData.level-1] || 0; const xpInLevel = nextLevelXp - prevLevelXp; const currentXpInLevel = levelData.xp - prevLevelXp; const progress = Math.min(100, (currentXpInLevel / xpInLevel) * 100); document.getElementById('level-start-text').textContent = `Level ${levelData.level}`; document.getElementById('level-xp-text').textContent = `${levelData.xp} / ${nextLevelXp} XP`; document.getElementById('level-progress-bar').style.width = `${progress}%`; }); listeners['equippedItems'] = db.ref(`/user_profile_settings/${uid}`).on('value', snapshot => { const settings = snapshot.val() || {}; const bagIcon = document.getElementById('main-bag-icon'); if(settings.equipped_bag_skin) { db.ref(`/shop_items/${settings.equipped_bag_skin}/icon`).once('value', icon => { if(icon.exists()) bagIcon.textContent = icon.val(); }); } else { bagIcon.textContent = '💰'; } }); }
+    // DÜZƏLDİLMİŞ BALANS YENİLƏMƏ FUNKSİYASI
+    function attachAllListeners(uid) {
+        detachAllListeners();
+        
+        // Balansları dinləyən listener
+        listeners['balance'] = db.ref('balances/' + uid).on('value', snapshot => {
+            const newBalance = snapshot.val()?.amount || 0;
+            const balanceText = newBalance.toFixed(2);
+            
+            // Hər iki balans elementini eyni anda yenilə
+            document.getElementById('balance').textContent = balanceText;
+            document.getElementById('header-azn-balance').querySelector('span').textContent = balanceText;
+            document.getElementById('birjaAznBalance').textContent = `${balanceText} AZN`;
+        });
+
+        // Coinləri dinləyən listener
+        listeners['coins'] = db.ref('user_coins/' + uid).on('value', snapshot => {
+            const coinAmount = snapshot.val()?.amount || 0;
+            const coinText = coinAmount.toFixed(2);
+            document.getElementById('header-coin-balance').querySelector('span').textContent = coinText;
+            document.getElementById('birjaUserCoinBalance').textContent = `${coinText} ${currentCoinData.name || 'Coin'}`;
+        });
+
+        // Almazları dinləyən listener
+        listeners['gems'] = db.ref('user_gems/' + uid).on('value', snapshot => {
+            document.getElementById('header-gem-balance').querySelector('span').textContent = snapshot.val()?.amount || 0;
+        });
+
+        // Səviyyəni dinləyən listener
+        listeners['level'] = db.ref('user_levels/' + uid).on('value', snapshot => {
+            const levelData = snapshot.val() || {level: 1, xp: 0};
+            const nextLevelXp = levelXpRequirements[levelData.level] || (10000 + (levelData.level - 9) * 5000);
+            const prevLevelXp = levelXpRequirements[levelData.level - 1] || 0;
+            const xpInLevel = nextLevelXp - prevLevelXp;
+            const currentXpInLevel = levelData.xp - prevLevelXp;
+            const progress = Math.min(100, (currentXpInLevel / xpInLevel) * 100);
+            document.getElementById('level-start-text').textContent = `Level ${levelData.level}`;
+            document.getElementById('level-xp-text').textContent = `${levelData.xp} / ${nextLevelXp} XP`;
+            document.getElementById('level-progress-bar').style.width = `${progress}%`;
+        });
+
+        // Tətbiq edilmiş əşyaları dinləyən listener
+        listeners['equippedItems'] = db.ref(`/user_profile_settings/${uid}`).on('value', snapshot => {
+            const settings = snapshot.val() || {};
+            const bagIcon = document.getElementById('main-bag-icon');
+            if(settings.equipped_bag_skin) {
+                db.ref(`/shop_items/${settings.equipped_bag_skin}/icon`).once('value', icon => {
+                    if(icon.exists()) bagIcon.textContent = icon.val();
+                });
+            } else {
+                bagIcon.textContent = '💰';
+            }
+        });
+    }
+
     function detachAllListeners() { for (const key in listeners) { if (listeners[key]) { listeners[key].off(); } } listeners = {}; }
     setupShopTabs();
   </script>
