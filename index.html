@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Oyun Paneli</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        :root {
+                :root {
             --bg-dark: #0f0c29;
             --bg-medium: #24243e;
-            --bg-light: #302b63;
             --card: rgba(255, 255, 255, 0.05);
             --glass: rgba(255, 255, 255, 0.1);
             --border-color: rgba(255, 255, 255, 0.1);
             --text-light: #f8fafc;
             --text-muted: #a9a9a9;
             --accent-purple: #8b5cf6;
-            --accent-blue: #3b82f6;
             --accent-green: #22c55e;
-            --accent-red: #ef4444;
             --accent-yellow: #f59e0b;
         }
         * {
@@ -28,326 +25,253 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background: linear-gradient(135deg, var(--bg-dark), var(--bg-light));
+            background: linear-gradient(135deg, var(--bg-dark), var(--bg-medium));
             color: var(--text-light);
-            display: flex;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding-top: 70px; /* Header hündürlüyü qədər */
+            padding-bottom: 80px; /* Footer hündürlüyü qədər */
         }
-              .sidebar {
-            width: 260px;
-            background-color: var(--bg-medium);
-            padding: 20px;
+                .top-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            border-right: 1px solid var(--border-color);
-        }
-        .sidebar-header {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            letter-spacing: 2px;
-        }
-        .sidebar-header .fa-shield-halved {
-            color: var(--accent-purple);
-        }
-        .nav-menu a {
-            display: flex;
+            justify-content: space-around;
             align-items: center;
-            padding: 15px;
+            padding: 10px;
+            background-color: var(--bg-medium);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 100;
+        }
+        .header-balance {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .header-balance i {
+            color: var(--accent-yellow);
+            margin-right: 5px;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--bg-medium);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 5px 0;
+            z-index: 100;
+        }
+        .nav-item {
             color: var(--text-muted);
             text-decoration: none;
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 8px 12px;
             border-radius: 8px;
-            margin-bottom: 10px;
-            font-weight: 600;
-            transition: background-color 0.3s, color 0.3s;
+            transition: all 0.2s ease;
+            cursor: pointer;
         }
-        .nav-menu a:hover {
-            background-color: var(--glass);
-            color: var(--text-light);
+        .nav-item span {
+            font-size: 1.5rem;
+            display: block;
         }
-        .nav-menu a.active {
-            background-color: var(--accent-purple);
-            color: white;
-            box-shadow: 0 0 15px var(--accent-purple);
+        .nav-item.active {
+            color: var(--accent-purple);
+            transform: translateY(-5px);
         }
-        .nav-menu a i {
-            width: 30px;
-            font-size: 1.1rem;
-        }
-        .main-content {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
+                .main-container {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         .page {
             display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .page.active {
             display: block;
         }
         .page-header {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 15px;
-        }
-              .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .stat-card {
-            background: var(--card);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        .stat-card .icon {
-            font-size: 2.5rem;
-            padding: 15px;
-            border-radius: 50%;
-            display: grid;
-            place-items: center;
-        }
-        .stat-card .icon.users { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
-        .stat-card .icon.coins { background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow); }
-        .stat-card .icon.gems { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
-        .stat-card .info .title {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 5px;
-        }
-        .stat-card .info .value {
             font-size: 1.8rem;
-            font-weight: bold;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
         }
-              .toolbar {
+                .earnings-section {
+            background: var(--card);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
             margin-bottom: 20px;
         }
-        .search-bar {
-            width: 100%;
-            padding: 12px 15px;
-            background-color: var(--card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-light);
-            font-size: 1rem;
-        }
-        .user-table-wrapper {
-            overflow-x: auto;
-        }
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: var(--card);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .user-table th, .user-table td {
-            padding: 15px;
-            text-align: left;
-        }
-        .user-table thead {
-            background-color: rgba(0,0,0,0.2);
-        }
-        .user-table tbody tr {
-            border-bottom: 1px solid var(--border-color);
-        }
-        .user-table tbody tr:last-child {
-            border-bottom: none;
-        }
-        .user-table tbody tr:hover {
-            background-color: var(--glass);
-        }
-        .user-table .user-info-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .user-table .user-info-cell img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        .user-table .user-info-cell span {
+        #earnings-amount {
+            font-size: 2.5rem;
             font-weight: bold;
+            color: var(--accent-green);
+            text-shadow: 0 0 10px var(--accent-green);
         }
-              .btn {
-            padding: 10px 18px;
+        #collect-earnings-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: var(--accent-green);
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.2s;
+        }
+        #collect-earnings-btn:hover {
+            box-shadow: 0 0 15px var(--accent-green);
+        }
+        .my-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+        }
+        .my-card {
+            background: var(--glass);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .my-card-icon { font-size: 3rem; }
+        .my-card-name { font-weight: 600; margin: 5px 0; }
+        .my-card-rate { font-size: 0.8rem; color: var(--accent-green); }
+                .shop-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .shop-item {
+            background: var(--card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+        }
+        .shop-item-icon { font-size: 4rem; }
+        .shop-item-name { font-weight: 600; font-size: 1.1rem; margin: 10px 0; }
+        .shop-item-rate { font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px; }
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
             border: none;
             border-radius: 8px;
-            font-weight: 600;
+            background-color: var(--accent-purple);
+            color: white;
+            font-weight: bold;
             cursor: pointer;
             transition: all 0.2s;
         }
-        .btn-primary {
-            background-color: var(--accent-blue);
-            color: white;
+        .buy-btn:hover {
+            box-shadow: 0 0 15px var(--accent-purple);
         }
-        .btn-primary:hover {
-            box-shadow: 0 0 10px var(--accent-blue);
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: var(--bg-medium);
-            padding: 30px;
-            border-radius: 15px;
-            border: 1px solid var(--border-color);
-            width: min(90vw, 600px);
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .modal-header {
+        .leaderboard-list li {
+            background: var(--card);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            justify-content: space-between;
+            font-size: 1.1rem;
         }
-        .modal-header h2 { font-size: 1.5rem; }
-        .close-modal {
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1.5rem;
+                .profile-card {
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent-purple);
+            margin-bottom: 15px;
+        }
+        .profile-name { font-size: 1.5rem; font-weight: bold; }
+        .profile-email { color: var(--text-muted); margin-top: 5px; margin-bottom: 20px; }
+        #logout-btn {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--accent-yellow);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--accent-yellow);
+            font-weight: bold;
             cursor: pointer;
         }
-        .modal-section { margin-bottom: 20px; }
-        .modal-section h3 { margin-bottom: 10px; color: var(--accent-purple); }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .info-grid p { background: var(--card); padding: 8px; border-radius: 6px; }
-        .info-grid p strong { color: var(--text-muted); }
-        .action-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        .action-group input { flex-grow: 1; padding: 10px; background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-light); }
-        .btn-green { background-color: var(--accent-green); color: white; }
-        .btn-red { background-color: var(--accent-red); color: white; }
-        .btn-yellow { background-color: var(--accent-yellow); color: var(--bg-dark); }
     </style>
 </head>
 <body>
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <i class="fa-solid fa-shield-halved"></i> ADMIN
+    <header class="top-header">
+        <div class="header-balance">
+            <i class="fa-solid fa-coins"></i>
+            <span id="user-coin-balance">0</span>
         </div>
-        <div class="nav-menu">
-            <a href="#dashboard" class="nav-link active"><i class="fa-solid fa-house-user"></i> Ana Səhifə</a>
-            <a href="#users" class="nav-link"><i class="fa-solid fa-users"></i> İstifadəçilər</a>
+        <div class="header-balance">
+            <i class="fa-solid fa-gem"></i>
+            <span id="user-gem-balance">0</span>
         </div>
-    </nav>
-    <main class="main-content">
-              <div id="dashboard" class="page active">
-            <h1 class="page-header">İdarəetmə Paneli</h1>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="icon users"><i class="fa-solid fa-users"></i></div>
-                    <div class="info">
-                        <div class="title">Cəmi İstifadəçilər</div>
-                        <div class="value" id="total-users-stat">0</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon coins"><i class="fa-solid fa-coins"></i></div>
-                    <div class="info">
-                        <div class="title">Dövriyyədəki Coin</div>
-                        <div class="value" id="total-coins-stat">0</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="icon gems"><i class="fa-solid fa-gem"></i></div>
-                    <div class="info">
-                        <div class="title">Dövriyyədəki Almaz</div>
-                        <div class="value" id="total-gems-stat">0</div>
-                    </div>
-                </div>
-            </div>
-              </div>
-                      <div id="users" class="page">
-            <h1 class="page-header">İstifadəçilərin Siyahısı</h1>
-            <div class="toolbar">
-                <input type="text" id="user-search" class="search-bar" placeholder="İstifadəçini ada, emailə və ya ID-yə görə axtar...">
-            </div>
-            <div class="user-table-wrapper">
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>İstifadəçi</th>
-                            <th>Email</th>
-                            <th>Coin Balansı</th>
-                            <th>ID</th>
-                            <th>Hərəkətlər</th>
-                        </tr>
-                    </thead>
-                    <tbody id="user-table-body">
-                        </tbody>
-                </table>
-            </div>
-                      </div>
-                       </main>
+    </header>
 
-    <div id="user-detail-modal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-user-name">İstifadəçi Məlumatları</h2>
-                <button class="close-modal">&times;</button>
+    <main class="main-container">
+                <div id="home-page" class="page active">
+            <div class="earnings-section">
+                <p style="color: var(--text-muted);">Toplanacaq Qazanc</p>
+                <div><span id="earnings-amount">0</span> <i class="fa-solid fa-coins"></i></div>
+                <button id="collect-earnings-btn">QAZANCI TOPLA</button>
             </div>
-            <div class="modal-body">
-                <div class="modal-section">
-                    <h3><i class="fa-solid fa-circle-info"></i> Ümumi Məlumat</h3>
-                    <div class="info-grid">
-                        <p><strong>Email:</strong> <span id="modal-user-email"></span></p>
-                        <p><strong>UID:</strong> <span id="modal-user-uid"></span></p>
-                        <p><strong>Friendly ID:</strong> <span id="modal-user-friendly-id"></span></p>
-                        <p><strong>Səviyyə:</strong> <span id="modal-user-level"></span></p>
-                    </div>
+            <h3 style="margin-bottom: 15px;">Mənim Kartlarım</h3>
+            <div id="my-cards-grid" class="my-cards-grid">
+                <p>Heç bir kartınız yoxdur. Mağazadan kart ala bilərsiniz.</p>
+            </div>
                 </div>
-                <div class="modal-section">
-                    <h3><i class="fa-solid fa-wallet"></i> Balans İdarəetməsi</h3>
-                    <div class="action-group">
-                        <input type="number" id="balance-amount-input" placeholder="Miqdar daxil et">
-                        <button id="add-coins-btn" class="btn btn-green"><i class="fa-solid fa-plus"></i> Coin Əlavə Et</button>
-                        <button id="remove-coins-btn" class="btn btn-yellow"><i class="fa-solid fa-minus"></i> Coin Çıx</button>
-                        <button id="add-gems-btn" class="btn btn-green"><i class="fa-solid fa-plus"></i> Almaz Əlavə Et</button>
-                        <button id="remove-gems-btn" class="btn btn-yellow"><i class="fa-solid fa-minus"></i> Almaz Çıx</button>
-                    </div>
+                        <div id="shop-page" class="page">
+            <h1 class="page-header">Mağaza</h1>
+            <div id="shop-grid" class="shop-grid">
                 </div>
-                <div class="modal-section">
-                    <h3><i class="fa-solid fa-ban"></i> Hesab Hərəkətləri</h3>
-                    <div class="action-group">
-                        <button id="suspend-user-btn" class="btn btn-yellow">Hesabı Dondur</button>
-                        <button id="delete-user-btn" class="btn btn-red">Hesabı Sil</button>
-                    </div>
-                </div>
+        </div>
+
+        <div id="leaderboard-page" class="page">
+            <h1 class="page-header">Liderlər Cədvəli</h1>
+            <ul id="leaderboard-list" class="leaderboard-list">
+                </ul>
+        </div>
+
+        <div id="profile-page" class="page">
+            <h1 class="page-header">Profil</h1>
+            <div class="profile-card">
+                <img id="profile-avatar" src="https://i.imgur.com/3YQ5h0Q.png" alt="Avatar" class="profile-avatar">
+                <h2 id="profile-name">Yüklənir...</h2>
+                <p id="profile-email">Yüklənir...</p>
+                <button id="logout-btn">Çıxış Et</button>
             </div>
         </div>
-    </div>
-      <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+    </main>
+
+    <footer>
+        <a class="nav-item active" data-page="home-page"><span><i class="fa-solid fa-house"></i></span>Əsas</a>
+        <a class="nav-item" data-page="shop-page"><span><i class="fa-solid fa-store"></i></span>Mağaza</a>
+        <a class="nav-item" data-page="leaderboard-page"><span><i class="fa-solid fa-ranking-star"></i></span>Liderlər</a>
+        <a class="nav-item" data-page="profile-page"><span><i class="fa-solid fa-user"></i></span>Profil</a>
+    </footer>
+        <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
-
     <script>
-        // SİZİN FİREBASE PROYETİNİZİN MƏLUMATLARI
         const firebaseConfig = {
             apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw",
             authDomain: "niceuc-e5986.firebaseapp.com",
@@ -359,30 +283,178 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        let allUsersData = []; // Bütün istifadəçiləri yadda saxlamaq üçün
-              document.addEventListener('DOMContentLoaded', () => {
-            // TƏHLÜKƏSİZLİK: Əsl proyektlərdə adminin giriş edib etmədiyini yoxlayın
-            // auth.onAuthStateChanged(user => { if (!user || !isAdmin(user.uid)) { window.location.href = '/login.html'; } });
-            
-            loadAllData();
+        let currentUser = null;
+        let earningsInterval = null; // Qazancı hər saniyə yeniləmək üçün
+                auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                // İstifadəçi məlumatlarını yüklə və oyunu başlat
+                loadUserData(user.uid);
+                loadShop();
+                loadLeaderboard();
+            } else {
+                // Əgər istifadəçi yoxdursa, giriş səhifəsinə yönləndir
+                // window.location.href = 'login.html'; 
+                console.log("İstifadəçi daxil olmayıb.");
+            }
+        });
 
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                    const pageId = link.getAttribute('href').substring(1);
-                    showPage(pageId);
-                });
-            });
+        async function loadUserData(uid) {
+            const userRef = db.ref(`game_users/${uid}`);
+            userRef.on('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (!userData) {
+                    // Yeni istifadəçi üçün məlumatları yarat
+                    const newUser = {
+                        displayName: currentUser.displayName,
+                        email: currentUser.email,
+                        photoURL: currentUser.photoURL,
+                        coins: 0,
+                        gems: 0,
+                        lastCollectedTime: Date.now(),
+                        cards: {}
+                    };
+                    userRef.set(newUser);
+                    return;
+                }
+                
+                // Balansları yenilə
+                document.getElementById('user-coin-balance').textContent = Math.floor(userData.coins);
+                document.getElementById('user-gem-balance').textContent = userData.gems;
+                
+                // Profil səhifəsini yenilə
+                document.getElementById('profile-avatar').src = userData.photoURL;
+                document.getElementById('profile-name').textContent = userData.displayName;
+                document.getElementById('profile-email').textContent = userData.email;
 
-            document.querySelector('.close-modal').addEventListener('click', () => {
-                document.getElementById('user-detail-modal').style.display = 'none';
+                // Qazancı hesablamağa başla
+                updateEarningsDisplay(uid);
+                if (earningsInterval) clearInterval(earningsInterval);
+                earningsInterval = setInterval(() => updateEarningsDisplay(uid), 1000);
+
+                // İstifadəçinin kartlarını göstər
+                renderMyCards(userData.cards);
             });
+        }
+
+        async function updateEarningsDisplay(uid) {
+            const userSnap = await db.ref(`game_users/${uid}`).once('value');
+            const userData = userSnap.val();
+            if (!userData) return;
             
-            document.getElementById('user-search').addEventListener('input', (e) => {
-                renderUserTable(e.target.value.toLowerCase());
+            const cardDetailsSnap = await db.ref('game_cards').once('value');
+            const cardDetails = cardDetailsSnap.val() || {};
+
+            let totalHourlyRate = 0;
+            if (userData.cards) {
+                for (const cardId in userData.cards) {
+                    const userCard = userData.cards[cardId];
+                    const cardInfo = cardDetails[cardId];
+                    if (cardInfo) {
+                        totalHourlyRate += cardInfo.rate * userCard.count;
+                    }
+                }
+            }
+
+            const timeDiffMs = Date.now() - userData.lastCollectedTime;
+            const timeDiffHours = timeDiffMs / 3600000;
+            const earnedCoins = timeDiffHours * totalHourlyRate;
+            
+            document.getElementById('earnings-amount').textContent = Math.floor(earnedCoins);
+        }
+
+        async function collectEarnings(uid) {
+            // Qazancı hesabla
+            const userSnap = await db.ref(`game_users/${uid}`).once('value');
+            const userData = userSnap.val();
+            const cardDetailsSnap = await db.ref('game_cards').once('value');
+            const cardDetails = cardDetailsSnap.val() || {};
+            let totalHourlyRate = 0;
+            if (userData.cards) {
+                for (const cardId in userData.cards) {
+                    const userCard = userData.cards[cardId];
+                    const cardInfo = cardDetails[cardId];
+                    if (cardInfo) totalHourlyRate += cardInfo.rate * userCard.count;
+                }
+            }
+            const timeDiffMs = Date.now() - userData.lastCollectedTime;
+            const timeDiffHours = timeDiffMs / 3600000;
+            const earnedCoins = Math.floor(timeDiffHours * totalHourlyRate);
+
+            if (earnedCoins > 0) {
+                const updates = {};
+                updates[`game_users/${uid}/coins`] = firebase.database.ServerValue.increment(earnedCoins);
+                updates[`game_users/${uid}/lastCollectedTime`] = Date.now();
+                await db.ref().update(updates);
+                alert(`${earnedCoins} coin toplandı!`);
+            } else {
+                alert("Toplanacaq qazanc yoxdur.");
+            }
+        }
+                async function loadShop() {
+            const shopRef = db.ref('game_cards');
+            shopRef.on('value', (snapshot) => {
+                const cards = snapshot.val();
+                const shopGrid = document.getElementById('shop-grid');
+                shopGrid.innerHTML = '';
+                for (const cardId in cards) {
+                    const card = cards[cardId];
+                    shopGrid.innerHTML += `
+                        <div class="shop-item">
+                            <div class="shop-item-icon">${card.icon}</div>
+                            <h3 class="shop-item-name">${card.name}</h3>
+                            <p class="shop-item-rate">+${card.rate} <i class="fa-solid fa-coins"></i>/saat</p>
+                            <button class="buy-btn" onclick="buyCard('${cardId}')">
+                                <i class="fa-solid fa-coins"></i> ${card.price}
+                            </button>
+                        </div>
+                    `;
+                }
+            });
+        }
+        
+        async function buyCard(cardId) {
+            if (!currentUser) return;
+            const uid = currentUser.uid;
+
+            const cardRef = db.ref(`game_cards/${cardId}`);
+            const userRef = db.ref(`game_users/${uid}`);
+
+            const cardSnap = await cardRef.once('value');
+            const userSnap = await userRef.once('value');
+
+            const cardData = cardSnap.val();
+            const userData = userSnap.val();
+
+            if (userData.coins >= cardData.price) {
+                const updates = {};
+                updates[`coins`] = firebase.database.ServerValue.increment(-cardData.price);
+                updates[`cards/${cardId}/count`] = firebase.database.ServerValue.increment(1);
+                
+                await userRef.update(updates);
+                alert(`'${cardData.name}' kartı uğurla alındı!`);
+            } else {
+                alert("Kifayət qədər coin yoxdur!");
+            }
+        }
+
+        function renderMyCards(cards) {
+            // Bu funksiya istifadəçinin kartlarını ana səhifədə göstərmək üçündür
+            // Ev tapşırığı olaraq bu funksiyanı yaza bilərsiniz :)
+        }
+
+        function loadLeaderboard() {
+            // Bu funksiya liderlər cədvəlini yükləmək üçündür
+        }
+
+        // Naviqasiya Məntiqi
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                const pageId = item.getAttribute('data-page');
+                showPage(pageId);
             });
         });
 
@@ -391,135 +463,14 @@
             document.getElementById(pageId).classList.add('active');
         }
 
-        async function loadAllData() {
-            const usersRef = db.ref('users');
-            usersRef.on('value', async (snapshot) => {
-                const usersData = snapshot.val();
-                if (!usersData) return;
+        // Düymə klikləri
+        document.getElementById('collect-earnings-btn').addEventListener('click', () => {
+            if (currentUser) collectEarnings(currentUser.uid);
+        });
 
-                const userPromises = Object.keys(usersData).map(async (uid) => {
-                    const user = usersData[uid];
-                    const coinSnap = await db.ref(`user_coins/${uid}/amount`).once('value');
-                    const gemSnap = await db.ref(`user_gems/${uid}/amount`).once('value');
-                    
-                    return {
-                        uid,
-                        displayName: user.displayName || 'Adsız',
-                        email: user.email || 'Email yoxdur',
-                        photoURL: user.photoURL || 'https://i.imgur.com/3YQ5h0Q.png',
-                        friendlyId: user.friendlyId || 'Yoxdur',
-                        coins: coinSnap.val() || 0,
-                        gems: gemSnap.val() || 0
-                    };
-                });
-
-                allUsersData = await Promise.all(userPromises);
-                renderUserTable();
-                updateStats();
-            });
-        }
-        
-        function renderUserTable(searchTerm = '') {
-            const tableBody = document.getElementById('user-table-body');
-            tableBody.innerHTML = '';
-            
-            const filteredUsers = allUsersData.filter(user => 
-                user.displayName.toLowerCase().includes(searchTerm) ||
-                user.email.toLowerCase().includes(searchTerm) ||
-                user.friendlyId.toString().includes(searchTerm)
-            );
-
-            if (filteredUsers.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Heç bir istifadəçi tapılmadı.</td></tr>';
-                return;
-            }
-
-            filteredUsers.forEach(user => {
-                const row = `
-                    <tr>
-                        <td>
-                            <div class="user-info-cell">
-                                <img src="${user.photoURL}" alt="Avatar">
-                                <span>${user.displayName}</span>
-                            </div>
-                        </td>
-                        <td>${user.email}</td>
-                        <td><i class="fa-solid fa-coins" style="color:var(--accent-yellow);"></i> ${user.coins.toFixed(2)}</td>
-                        <td>#${user.friendlyId}</td>
-                        <td><button class="btn btn-primary" onclick="showUserDetails('${user.uid}')">Ətraflı</button></td>
-                    </tr>
-                `;
-                tableBody.innerHTML += row;
-            });
-        }
-        
-        function updateStats() {
-            document.getElementById('total-users-stat').textContent = allUsersData.length;
-            const totalCoins = allUsersData.reduce((sum, user) => sum + user.coins, 0);
-            const totalGems = allUsersData.reduce((sum, user) => sum + user.gems, 0);
-            document.getElementById('total-coins-stat').textContent = totalCoins.toFixed(2);
-            document.getElementById('total-gems-stat').textContent = totalGems;
-        }
-
-        async function showUserDetails(uid) {
-            const userSnap = await db.ref(`users/${uid}`).once('value');
-            const levelSnap = await db.ref(`user_levels/${uid}`).once('value');
-            const user = userSnap.val();
-            const levelData = levelSnap.val() || {level: 1};
-
-            document.getElementById('modal-user-name').textContent = user.displayName;
-            document.getElementById('modal-user-email').textContent = user.email;
-            document.getElementById('modal-user-uid').textContent = uid;
-            document.getElementById('modal-user-friendly-id').textContent = `#${user.friendlyId}`;
-            document.getElementById('modal-user-level').textContent = levelData.level;
-
-            // Modal düymələrini istifadəçiyə bağlamaq
-            document.getElementById('add-coins-btn').onclick = () => updateUserBalance(uid, 'coins', true);
-            document.getElementById('remove-coins-btn').onclick = () => updateUserBalance(uid, 'coins', false);
-            document.getElementById('add-gems-btn').onclick = () => updateUserBalance(uid, 'gems', true);
-            document.getElementById('remove-gems-btn').onclick = () => updateUserBalance(uid, 'gems', false);
-            document.getElementById('delete-user-btn').onclick = () => deleteUser(uid, user.friendlyId);
-
-            document.getElementById('user-detail-modal').style.display = 'flex';
-              }
-              async function updateUserBalance(uid, currency, isAdding) {
-            const amountInput = document.getElementById('balance-amount-input');
-            const amount = parseFloat(amountInput.value);
-
-            if (isNaN(amount) || amount <= 0) {
-                alert("Zəhmət olmasa, düzgün miqdar daxil edin.");
-                return;
-            }
-
-            const currencyRef = db.ref(currency === 'coins' ? `user_coins/${uid}/amount` : `user_gems/${uid}/amount`);
-            const finalAmount = isAdding ? amount : -amount;
-            
-            await currencyRef.set(firebase.database.ServerValue.increment(finalAmount));
-            
-            alert(`Əməliyyat uğurludur! İstifadəçinin ${currency} balansı yeniləndi.`);
-            amountInput.value = '';
-        }
-
-        async function deleteUser(uid, friendlyId) {
-            if (!confirm("DİQQƏT! Bu istifadəçini və ona aid bütün məlumatları (balans, kartlar, tarixçə) silmək istədiyinizə əminsiniz? Bu əməliyyat geri qaytarılmazdır!")) {
-                return;
-            }
-            try {
-                const updates = {};
-                updates[`/users/${uid}`] = null;
-                updates[`/user_coins/${uid}`] = null;
-                updates[`/user_gems/${uid}`] = null;
-                updates[`/user_levels/${uid}`] = null;
-                updates[`/user_inventory/${uid}`] = null; // Əgər istifadə edirsinizsə
-                updates[`/friendly_id_lookup/${friendlyId}`] = null; // ID-ni də silmək
-
-                await db.ref().update(updates);
-                alert("İstifadəçi uğurla silindi.");
-                document.getElementById('user-detail-modal').style.display = 'none';
-            } catch (error) {
-                alert("Xəta baş verdi: " + error.message);
-            }
-        }
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut();
+        });
     </script>
 </body>
 </html>
