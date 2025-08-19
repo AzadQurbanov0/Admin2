@@ -177,6 +177,9 @@
         .buy-btn:hover {
             box-shadow: 0 0 15px var(--accent-purple);
         }
+        .leaderboard-list {
+            list-style: none;
+        }
         .leaderboard-list li {
             background: var(--card);
             padding: 15px;
@@ -288,53 +291,45 @@
                 auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                // İstifadəçi məlumatlarını yüklə və oyunu başlat
                 loadUserData(user.uid);
                 loadShop();
                 loadLeaderboard();
             } else {
-                // Əgər istifadəçi yoxdursa, giriş səhifəsinə yönləndir
-                // window.location.href = 'login.html'; 
-                console.log("İstifadəçi daxil olmayıb.");
+                // Giriş edilməyibsə, Google ilə giriş düyməsi göstərilə bilər.
+                // Bu hissəni öz proyektinizə uyğunlaşdırın.
+                document.body.innerHTML = `<div style="text-align:center; padding-top: 50px;"><h1>Xoş Gəlmisiniz!</h1><p>Davam etmək üçün daxil olun.</p></div>`;
             }
         });
 
         async function loadUserData(uid) {
             const userRef = db.ref(`game_users/${uid}`);
-            userRef.on('value', (snapshot) => {
-                const userData = snapshot.val();
+            userRef.on('value', async (snapshot) => {
+                let userData = snapshot.val();
                 if (!userData) {
-                    // Yeni istifadəçi üçün məlumatları yarat
-                    const newUser = {
-                        displayName: currentUser.displayName,
-                        email: currentUser.email,
-                        photoURL: currentUser.photoURL,
-                        coins: 0,
-                        gems: 0,
-                        lastCollectedTime: Date.now(),
-                        cards: {}
+                    userData = {
+                        displayName: currentUser.displayName, email: currentUser.email, photoURL: currentUser.photoURL,
+                        coins: 100, gems: 0, lastCollectedTime: Date.now(), cards: {}
                     };
-                    userRef.set(newUser);
-                    return;
+                    await userRef.set(userData);
                 }
                 
-                // Balansları yenilə
                 document.getElementById('user-coin-balance').textContent = Math.floor(userData.coins);
                 document.getElementById('user-gem-balance').textContent = userData.gems;
                 
-                // Profil səhifəsini yenilə
                 document.getElementById('profile-avatar').src = userData.photoURL;
                 document.getElementById('profile-name').textContent = userData.displayName;
                 document.getElementById('profile-email').textContent = userData.email;
 
-                // Qazancı hesablamağa başla
-                updateEarningsDisplay(uid);
                 if (earningsInterval) clearInterval(earningsInterval);
                 earningsInterval = setInterval(() => updateEarningsDisplay(uid), 1000);
 
-                // İstifadəçinin kartlarını göstər
-                renderMyCards(userData.cards);
+                const cardDetails = await getCardDetails();
+                renderMyCards(userData.cards, cardDetails);
             });
+        }
+
+        function getCardDetails() {
+            return db.ref('game_cards').once('value').then(snap => snap.val() || {});
         }
 
         async function updateEarningsDisplay(uid) {
@@ -342,8 +337,7 @@
             const userData = userSnap.val();
             if (!userData) return;
             
-            const cardDetailsSnap = await db.ref('game_cards').once('value');
-            const cardDetails = cardDetailsSnap.val() || {};
+            const cardDetails = await getCardDetails();
 
             let totalHourlyRate = 0;
             if (userData.cards) {
@@ -355,26 +349,23 @@
                     }
                 }
             }
-
             const timeDiffMs = Date.now() - userData.lastCollectedTime;
             const timeDiffHours = timeDiffMs / 3600000;
             const earnedCoins = timeDiffHours * totalHourlyRate;
-            
             document.getElementById('earnings-amount').textContent = Math.floor(earnedCoins);
         }
 
-        async function collectEarnings(uid) {
-            // Qazancı hesabla
+        async function collectEarnings() {
+            if (!currentUser) return;
+            const uid = currentUser.uid;
+            
             const userSnap = await db.ref(`game_users/${uid}`).once('value');
             const userData = userSnap.val();
-            const cardDetailsSnap = await db.ref('game_cards').once('value');
-            const cardDetails = cardDetailsSnap.val() || {};
+            const cardDetails = await getCardDetails();
             let totalHourlyRate = 0;
             if (userData.cards) {
                 for (const cardId in userData.cards) {
-                    const userCard = userData.cards[cardId];
-                    const cardInfo = cardDetails[cardId];
-                    if (cardInfo) totalHourlyRate += cardInfo.rate * userCard.count;
+                    totalHourlyRate += (cardDetails[cardId]?.rate || 0) * userData.cards[cardId].count;
                 }
             }
             const timeDiffMs = Date.now() - userData.lastCollectedTime;
@@ -383,8 +374,8 @@
 
             if (earnedCoins > 0) {
                 const updates = {};
-                updates[`game_users/${uid}/coins`] = firebase.database.ServerValue.increment(earnedCoins);
-                updates[`game_users/${uid}/lastCollectedTime`] = Date.now();
+                updates[`/game_users/${uid}/coins`] = firebase.database.ServerValue.increment(earnedCoins);
+                updates[`/game_users/${uid}/lastCollectedTime`] = Date.now();
                 await db.ref().update(updates);
                 alert(`${earnedCoins} coin toplandı!`);
             } else {
@@ -392,37 +383,31 @@
             }
         }
                 async function loadShop() {
-            const shopRef = db.ref('game_cards');
-            shopRef.on('value', (snapshot) => {
-                const cards = snapshot.val();
-                const shopGrid = document.getElementById('shop-grid');
-                shopGrid.innerHTML = '';
-                for (const cardId in cards) {
-                    const card = cards[cardId];
-                    shopGrid.innerHTML += `
-                        <div class="shop-item">
-                            <div class="shop-item-icon">${card.icon}</div>
-                            <h3 class="shop-item-name">${card.name}</h3>
-                            <p class="shop-item-rate">+${card.rate} <i class="fa-solid fa-coins"></i>/saat</p>
-                            <button class="buy-btn" onclick="buyCard('${cardId}')">
-                                <i class="fa-solid fa-coins"></i> ${card.price}
-                            </button>
-                        </div>
-                    `;
-                }
-            });
+            const cards = await getCardDetails();
+            const shopGrid = document.getElementById('shop-grid');
+            shopGrid.innerHTML = '';
+            for (const cardId in cards) {
+                const card = cards[cardId];
+                shopGrid.innerHTML += `
+                    <div class="shop-item">
+                        <div class="shop-item-icon">${card.icon}</div>
+                        <h3 class="shop-item-name">${card.name}</h3>
+                        <p class="shop-item-rate">+${card.rate} <i class="fa-solid fa-coins"></i>/saat</p>
+                        <button class="buy-btn" onclick="buyCard('${cardId}')">
+                            <i class="fa-solid fa-coins"></i> ${card.price}
+                        </button>
+                    </div>
+                `;
+            }
         }
         
         async function buyCard(cardId) {
             if (!currentUser) return;
             const uid = currentUser.uid;
-
             const cardRef = db.ref(`game_cards/${cardId}`);
             const userRef = db.ref(`game_users/${uid}`);
-
             const cardSnap = await cardRef.once('value');
             const userSnap = await userRef.once('value');
-
             const cardData = cardSnap.val();
             const userData = userSnap.val();
 
@@ -430,7 +415,6 @@
                 const updates = {};
                 updates[`coins`] = firebase.database.ServerValue.increment(-cardData.price);
                 updates[`cards/${cardId}/count`] = firebase.database.ServerValue.increment(1);
-                
                 await userRef.update(updates);
                 alert(`'${cardData.name}' kartı uğurla alındı!`);
             } else {
@@ -438,16 +422,42 @@
             }
         }
 
-        function renderMyCards(cards) {
-            // Bu funksiya istifadəçinin kartlarını ana səhifədə göstərmək üçündür
-            // Ev tapşırığı olaraq bu funksiyanı yaza bilərsiniz :)
+        function renderMyCards(userCards, cardDetails) {
+            const grid = document.getElementById('my-cards-grid');
+            grid.innerHTML = '';
+            if (!userCards || Object.keys(userCards).length === 0) {
+                grid.innerHTML = '<p>Heç bir kartınız yoxdur. Mağazadan kart ala bilərsiniz.</p>';
+                return;
+            }
+            for (const cardId in userCards) {
+                const cardInfo = cardDetails[cardId];
+                const userCard = userCards[cardId];
+                if (cardInfo) {
+                    grid.innerHTML += `
+                        <div class="my-card">
+                            <div class="my-card-icon">${cardInfo.icon}</div>
+                            <div class="my-card-name">${cardInfo.name} (x${userCard.count})</div>
+                            <div class="my-card-rate">+${cardInfo.rate * userCard.count} <i class="fa-solid fa-coins"></i>/saat</div>
+                        </div>
+                    `;
+                }
+            }
         }
 
-        function loadLeaderboard() {
-            // Bu funksiya liderlər cədvəlini yükləmək üçündür
+        async function loadLeaderboard() {
+            const usersRef = db.ref('game_users').orderByChild('coins').limitToLast(10);
+            const snapshot = await usersRef.once('value');
+            const users = snapshot.val();
+            const list = document.getElementById('leaderboard-list');
+            list.innerHTML = '';
+            if (!users) return;
+
+            const sortedUsers = Object.values(users).sort((a,b) => b.coins - a.coins);
+            sortedUsers.forEach(user => {
+                list.innerHTML += `<li><span>${user.displayName}</span><span>${Math.floor(user.coins)} <i class="fa-solid fa-coins"></i></span></li>`;
+            });
         }
 
-        // Naviqasiya Məntiqi
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', () => {
@@ -463,14 +473,8 @@
             document.getElementById(pageId).classList.add('active');
         }
 
-        // Düymə klikləri
-        document.getElementById('collect-earnings-btn').addEventListener('click', () => {
-            if (currentUser) collectEarnings(currentUser.uid);
-        });
-
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            auth.signOut();
-        });
+        document.getElementById('collect-earnings-btn').addEventListener('click', collectEarnings);
+        document.getElementById('logout-btn').addEventListener('click', () => auth.signOut());
     </script>
 </body>
 </html>
