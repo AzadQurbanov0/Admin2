@@ -125,7 +125,7 @@ body{
   to { transform: translateY(100vh) rotateZ(720deg); opacity: 0; }
 }
 .page-list ul { list-style: none; padding: 0; width: 100%; text-align: left; margin-top: 15px; max-height: 400px; overflow-y: auto; }
-.page-list li { background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 1rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
+.page-list li { background: var(--glass); padding: 12px 15px; border-radius: 8px; margin-bottom: 8px; font-size: 1rem; font-weight: 500; display: flex; justify-content: space-between; align-items: center; }
 .page-list li:first-child { background: #f59e0b; color: var(--bg1); font-weight: bold; }
 #game-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10002; display: none; }
 footer { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card); backdrop-filter: blur(10px); display: flex; justify-content: space-around; padding: 5px 0; z-index: 1001; border-top: 1px solid var(--border-color); }
@@ -177,7 +177,7 @@ footer { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--car
 .history-amount { text-align: right; }
 .history-amount p { margin: 0; font-weight: bold; font-size: 1rem; }
 .history-amount .history-meta { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
-  /* ================== AYARLAR və MAĞAZA SƏHİFƏSİ STİLLƏRİ (YENİ) ================== */
+  /* ================== AYARLAR, MAĞAZA, TAPŞIRIQLAR, LİDERLƏR STİLLƏRİ (YENİ) ================== */
 #top-header { position: fixed; top: 0; left: 0; width: 100%; background: var(--card); backdrop-filter: blur(10px); z-index: 1001; padding: 10px 15px; display: none; justify-content: space-around; align-items: center; border-bottom: 1px solid var(--border-color); }
 .header-balance { display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 0.9rem; }
 .header-balance span:first-child { font-size: 1.2rem; }
@@ -224,6 +224,19 @@ input:checked + .slider:before { transform: translateX(22px); }
 .gem-pack h3 { margin: 0 0 5px 0; font-size: 1.8rem; }
 .gem-pack p { margin: 0 0 15px 0; opacity: 0.9; }
 .btn-buy-gem { background: white; color: var(--blue); padding: 10px 20px; width: 100%; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+.leaderboard-item-user { display: flex; align-items: center; gap: 10px; flex-grow: 1; }
+.leaderboard-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid transparent; }
+.leaderboard-avatar.frame-gold { border-color: #ffd700; }
+.leaderboard-avatar.frame-silver { border-color: #c0c0c0; }
+.task-card { background: var(--card); border-left: 4px solid var(--purple); border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+.task-header { display: flex; justify-content: space-between; align-items: center; }
+.task-title { font-size: 1.1rem; font-weight: 600; }
+.task-reward { font-weight: bold; color: var(--diamond); }
+.task-description { font-size: 0.9rem; color: var(--text-muted); }
+.task-button { padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+.task-button.do { background-color: var(--purple); color: white; }
+.task-button.pending { background-color: var(--yellow); color: var(--bg1); cursor: not-allowed; }
+.task-button.completed { background-color: var(--accent); color: var(--bg1); cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -240,9 +253,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 <div id="countdown-banner">Para Yağışı <span id="countdown-timer">30</span> saniyəyə başlayır!</div>
 
 <div class="content-wrapper">
-    <div id="notification-bell"><span>🔔</span><div id="notification-badge" style="display:none;">1</div></div>
-    <div id="status-icon"><span>ℹ️</span></div>
-    <div class="action-buttons"><button id="payBtn">💲 BALANSI ARTIR</button><button id="cekBtn">📷 ÇEK ŞƏKLİ</button><button id="pulCekBtn">🏦 PULU ÇIXART</button></div>
+    <div id="notification-bell" style="display:none;"><span>🔔</span><div id="notification-badge" style="display:none;">1</div></div>
+    <div id="status-icon" style="display:none;"><span>ℹ️</span></div>
+    <div class="action-buttons" style="display:none;"><button id="payBtn">💲 BALANSI ARTIR</button><button id="cekBtn">📷 ÇEK ŞƏKLİ</button><button id="pulCekBtn">🏦 PULU ÇIXART</button></div>
 
     <div id="main-page" class="page active">
         <main class="wrap">
@@ -267,16 +280,18 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="shop-tab" id="leaderboard-tab-level">Səviyyə</div>
         </div>
         <div id="leaderboard-rain-content">
-            <div id="leaderboard-list" class="page-list"><ul><li>Yüklənir...</li></ul></div>
+            <div id="leaderboard-list" class="page-list"><ul></ul></div>
         </div>
         <div id="leaderboard-level-content" style="display: none;">
-            <div id="level-leaderboard-list" class="page-list"><ul><li>Yüklənir...</li></ul></div>
+            <div id="level-leaderboard-list" class="page-list"><ul></ul></div>
         </div>
     </div>
-
-    <div id="stats-page" class="page">
-        <h2 class="page-header">Statistika</h2>
-        <div id="stats-list" class="page-list"><ul><li>Yüklənir...</li></ul></div>
+    
+    <div id="tasks-page" class="page">
+        <h2 class="page-header">Tapşırıqlar</h2>
+        <div id="tasks-container">
+            <p style="text-align:center; color: var(--text-muted);">Yüklənir...</p>
+        </div>
     </div>
 
     <div id="birja-page" class="page">
@@ -286,14 +301,8 @@ input:checked + .slider:before { transform: translateX(22px); }
         </div>
         <div class="card birja-card">
             <div class="birja-balance-grid">
-                <div>
-                    <span>Pul Balansınız</span>
-                    <p id="birjaAznBalance">0.00 AZN</p>
-                </div>
-                <div>
-                    <span>Coin Balansınız</span>
-                    <p id="birjaUserCoinBalance">0.00 Coin</p>
-                </div>
+                <div><span>Pul Balansınız</span><p id="birjaAznBalance">0.00 AZN</p></div>
+                <div><span>Coin Balansınız</span><p id="birjaUserCoinBalance">0.00 Coin</p></div>
             </div>
         </div>
         <div class="card birja-card trade-panel">
@@ -302,27 +311,19 @@ input:checked + .slider:before { transform: translateX(22px); }
                 <div class="tab" id="sell-tab">Satmaq</div>
             </div>
             <div id="buy-form">
-                <div class="form-group">
-                    <label>Almaq istədiyiniz miqdar (Coin)</label>
-                    <input type="number" id="buyAmount" placeholder="0.00" oninput="calculateBirjaTotal('buy')">
-                </div>
+                <div class="form-group"><label>Almaq istədiyiniz miqdar (Coin)</label><input type="number" id="buyAmount" placeholder="0.00" oninput="calculateBirjaTotal('buy')"></div>
                 <div class="summary" id="buySummary">Yekun Məbləğ: 0.00 AZN</div><br>
                 <button class="btn btn-buy" id="buyCoinBtn">ALMAQ</button>
             </div>
             <div id="sell-form" style="display:none;">
-                <div class="form-group">
-                    <label>Satmaq istədiyiniz miqdar (Coin)</label>
-                    <input type="number" id="sellAmount" placeholder="0.00" oninput="calculateBirjaTotal('sell')">
-                </div>
+                <div class="form-group"><label>Satmaq istədiyiniz miqdar (Coin)</label><input type="number" id="sellAmount" placeholder="0.00" oninput="calculateBirjaTotal('sell')"></div>
                 <div class="summary" id="sellSummary">Əldə edəcəksiniz: 0.00 AZN</div><br>
                 <button class="btn btn-sell" id="sellCoinBtn">SATMAQ</button>
             </div>
         </div>
         <div class="card birja-card">
             <h3 style="text-align: center; margin-bottom: 15px; opacity: 0.9;">Əməliyyat Tarixçəsi</h3>
-            <div class="history-list-container" id="transaction-history-list">
-                <p style="text-align:center; opacity:0.6;">Yüklənir...</p>
-            </div>
+            <div class="history-list-container" id="transaction-history-list"><p style="text-align:center; opacity:0.6;">Yüklənir...</p></div>
         </div>
     </div>
         <div id="shop-page" class="page">
@@ -332,30 +333,13 @@ input:checked + .slider:before { transform: translateX(22px); }
             <div class="shop-tab" data-tab="my-items">Mənim Əşyalarım</div>
             <div class="shop-tab" data-tab="buy-gems">Almaz Al</div>
         </div>
-        
-        <div class="shop-content" id="shop-items">
-             <div class="shop-grid" id="shop-grid-container"><p>Yüklənir...</p></div>
-        </div>
-        <div class="shop-content" id="my-items" style="display: none;">
-            <div class="shop-grid" id="my-items-container"><p>Yüklənir...</p></div>
-        </div>
+        <div class="shop-content" id="shop-items"><div class="shop-grid" id="shop-grid-container"><p>Yüklənir...</p></div></div>
+        <div class="shop-content" id="my-items" style="display: none;"><div class="shop-grid" id="my-items-container"><p>Yüklənir...</p></div></div>
         <div class="shop-content" id="buy-gems" style="display: none;">
             <div class="gem-pack-grid">
-                <div class="gem-pack">
-                    <h3>100 💎</h3>
-                    <p>Kiçik Almaz Paketi</p>
-                    <button class="btn-buy-gem" onclick="buyGems(1)">1.00 AZN ilə Al</button>
-                </div>
-                <div class="gem-pack">
-                    <h3>550 💎</h3>
-                    <p>+10% Bonus ilə Orta Paket</p>
-                    <button class="btn-buy-gem" onclick="buyGems(5)">5.00 AZN ilə Al</button>
-                </div>
-                 <div class="gem-pack">
-                    <h3>1200 💎</h3>
-                    <p>+20% Bonus ilə Böyük Paket</p>
-                    <button class="btn-buy-gem" onclick="buyGems(10)">10.00 AZN ilə Al</button>
-                </div>
+                <div class="gem-pack"><h3>100 💎</h3><p>Kiçik Almaz Paketi</p><button class="btn-buy-gem" onclick="buyGems(1)">1.00 AZN ilə Al</button></div>
+                <div class="gem-pack"><h3>550 💎</h3><p>+10% Bonus ilə Orta Paket</p><button class="btn-buy-gem" onclick="buyGems(5)">5.00 AZN ilə Al</button></div>
+                 <div class="gem-pack"><h3>1200 💎</h3><p>+20% Bonus ilə Böyük Paket</p><button class="btn-buy-gem" onclick="buyGems(10)">10.00 AZN ilə Al</button></div>
             </div>
         </div>
     </div>
@@ -366,28 +350,16 @@ input:checked + .slider:before { transform: translateX(22px); }
             <img id="user-avatar" src="https://i.imgur.com/3YQ5h0Q.png" alt="Avatar" class="profile-avatar">
             <h3 id="user-display-name">Yüklənir...</h3>
             <p id="user-email">Yüklənir...</p>
-            <p id="user-friendly-id" style="font-size: 0.9rem; background: var(--glass); padding: 5px 10px; border-radius: 8px; margin-top: 10px;"></p>
+            <p id="user-friendly-id"></p>
             <div class="level-bar-container">
                 <div class="level-text"><span id="level-start-text"></span><span id="level-xp-text"></span></div>
                 <div class="progress-bar"><div class="progress-bar-inner" id="level-progress-bar"></div></div>
             </div>
         </div>
         <div class="settings-card settings-section">
-            <div class="setting-item">
-                <span>Qaranlıq Rejim</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="theme-toggle">
-                    <span class="slider"></span>
-                </label>
-            </div>
-            <div class="setting-item" id="help-section-in-settings" style="cursor: pointer;">
-                 <span>Kömək və Məlumat</span>
-                 <span>></span>
-            </div>
-            <div class="setting-item">
-                <span>Versiya</span>
-                <span>2.0.0</span>
-            </div>
+            <div class="setting-item"><span>Qaranlıq Rejim</span><label class="toggle-switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label></div>
+            <div class="setting-item" id="help-section-in-settings" style="cursor: pointer;"><span>Kömək və Məlumat</span><span>></span></div>
+            <div class="setting-item"><span>Versiya</span><span>2.1.0</span></div>
         </div>
         <div class="settings-card danger-zone">
             <button id="logoutBtn" class="btn-logout">Çıxış Et</button>
@@ -397,21 +369,13 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div id="help-page" class="page">
         <h2 class="page-header">Kömək</h2>
         <button class="accordion">"Para Çuvalı" nədir?</button>
-        <div class="panel">
-            <p>Bu, istifadəçilərin müxtəlif yollarla virtual balans artıra və "Para Yağışı" kimi oyunlarda iştirak edərək real mükafatlar qazana biləcəyi bir əyləncə platformasıdır.</p>
-        </div>
+        <div class="panel"><p>Bu, istifadəçilərin müxtəlif yollarla virtual balans artıra və "Para Yağışı" kimi oyunlarda iştirak edərək real mükafatlar qazana biləcəyi bir əyləncə platformasıdır.</p></div>
         <button class="accordion">Balansı necə artırmaq olar?</button>
-        <div class="panel">
-            <p>Əsas səhifədəki "BALANSI ARTIR" düyməsini istifadə edərək təlimatlara əməl edə bilərsiniz.</p>
-        </div>
+        <div class="panel"><p>Əsas səhifədəki "BALANSI ARTIR" düyməsini istifadə edərək təlimatlara əməl edə bilərsiniz.</p></div>
         <button class="accordion">Pul çıxarmaq mümkündür?</button>
-        <div class="panel">
-            <p>Bəli, "PULU ÇIXART" düyməsini istifadə edərək bank kartınıza pul çıxarışı üçün sorğu göndərə bilərsiniz. Sorğular administrasiya tərəfindən yoxlanılır.</p>
-        </div>
+        <div class="panel"><p>Bəli, "PULU ÇIXART" düyməsini istifadə edərək bank kartınıza pul çıxarışı üçün sorğu göndərə bilərsiniz. Sorğular administrasiya tərəfindən yoxlanılır.</p></div>
         <button class="accordion">"Para Yağışı" nədir?</button>
-        <div class="panel">
-            <p>Bu, təsadüfi zamanlarda başlayan bir oyundur. Ekrandan düşən ikonları tutaraq xal qazanırsınız. Oyun sonunda ən çox xal toplayanlar balanslarına real pul mükafatı əldə edirlər. Liderlər cədvəlindən nəticələrə baxa bilərsiniz.</p>
-        </div>
+        <div class="panel"><p>Bu, təsadüfi zamanlarda başlayan bir oyundur. Ekrandan düşən ikonları tutaraq xal qazanırsınız. Oyun sonunda ən çox xal toplayanlar balanslarına real pul mükafatı əldə edirlər. Liderlər cədvəlindən nəticələrə baxa bilərsiniz.</p></div>
     </div>
 
     <div class="modalOverlay" id="payModal"><div class="modalContent"><p>💲 PUL YÜKLƏ M10 077 543 50 53</p><button class="close-modal-btn">Bağla</button></div></div>
@@ -427,7 +391,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 <footer>
     <a class="nav-item active" id="homeBtn"><span>🏠</span>Əsas</a>
     <a class="nav-item" id="leaderboardBtn"><span>🏅</span>Liderlər</a>
-    <a class="nav-item" id="statsBtn"><span>📊</span>Statistika</a>
+    <a class="nav-item" id="tasksBtn"><span>🎯</span>Tapşırıqlar</a>
     <a class="nav-item" id="birjaBtn"><span>📈</span>Birja</a>
     <a class="nav-item" id="shopBtn"><span>🛒</span>Mağaza</a>
 </footer>
@@ -435,7 +399,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-database-compat.js"></script>
 <script>
-    const firebaseConfig = { apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw", authDomain: "niceuc-e5986.firebaseapp.com", databaseURL: "https://niceuc-e5986-default-rtdb.firebaseio.com", projectId: "niceuc-e5986", appId: "1:242221260650:web:d140153a2167c4738dcf13" };
+    const firebaseConfig = { apiKey: "AIzaSyC4sGTK_P4KperVswrxxmt69H5cocsgnNw", authDomain: "niceuc-e5986.firebaseapp.com", databaseURL: "https://niceuc-e986-default-rtdb.firebaseio.com", projectId: "niceuc-e5986", appId: "1:242221260650:web:d140153a2167c4738dcf13" };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
@@ -447,11 +411,12 @@ input:checked + .slider:before { transform: translateX(22px); }
         const settingsBtn = document.getElementById('settingsBtn');
         if (user) {
             checkAndAssignFriendlyId(user);
+            checkDailyLogin(user.uid);
             document.getElementById('user-greeting').textContent = `Salam, ${user.displayName}`;
             document.getElementById('loginBtn').style.display = 'none';
             settingsBtn.style.display = 'inline-block';
             topHeader.style.display = 'flex';
-            db.ref('users/' + user.uid).update({ displayName: user.displayName, email: user.email });
+            db.ref('users/' + user.uid).update({ displayName: user.displayName, email: user.email, photoURL: user.photoURL });
             attachAllListeners(user.uid);
             supportWidget.style.display = 'block';
             initializeSupportChat(user);
@@ -498,8 +463,8 @@ input:checked + .slider:before { transform: translateX(22px); }
     async function buyGems(aznAmount) { const user = auth.currentUser; if(!user) return; const gemPacks = {1: 100, 5: 550, 10: 1200}; const gemsToGet = gemPacks[aznAmount]; if(!confirm(`${aznAmount.toFixed(2)} AZN balansınızdan istifadə edərək ${gemsToGet} 💎 Almaz almaq istədiyinizə əminsiniz?`)) return; const balanceRef = db.ref(`/balances/${user.uid}/amount`); try { const balanceSnapshot = await balanceRef.once('value'); const currentBalance = balanceSnapshot.val() || 0; if(currentBalance < aznAmount) { alert("AZN balansınızda kifayət qədər vəsait yoxdur."); return; } const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(-aznAmount); updates[`/user_gems/${user.uid}/amount`] = firebase.database.ServerValue.increment(gemsToGet); await db.ref().update(updates); alert("Almazlar uğurla alındı!"); } catch (e) { alert("Xəta baş verdi: " + e.message); } }
     async function buyItem(itemId, price) { const user = auth.currentUser; if(!user) return; if(!confirm(`Bu əşyanı ${price} 💎 Almaz qarşılığında almaq istəyirsiniz?`)) return; const gemRef = db.ref(`/user_gems/${user.uid}/amount`); try { const gemSnapshot = await gemRef.once('value'); const currentGems = gemSnapshot.val() || 0; if(currentGems < price) { alert("Almaz balansınızda kifayət qədər vəsait yoxdur."); return; } const updates = {}; updates[`/user_gems/${user.uid}/amount`] = firebase.database.ServerValue.increment(-price); updates[`/user_inventory/${user.uid}/${itemId}`] = true; await db.ref().update(updates); alert("Əşya uğurla alındı! 'Mənim Əşyalarım' bölməsindən tətbiq edə bilərsiniz."); loadShopItems(); loadMyItems(); } catch(e) { alert("Xəta baş verdi: " + e.message); } }
     async function equipItem(itemId, itemType) { const user = auth.currentUser; if(!user) return; const settingPath = itemType === 'frame' ? 'equipped_frame' : 'equipped_bag_skin'; await db.ref(`/user_profile_settings/${user.uid}/${settingPath}`).set(itemId); alert("Əşya uğurla tətbiq edildi!"); loadMyItems(); }
-    async function loadShopItems() { const shopContainer = document.getElementById('shop-grid-container'); const user = auth.currentUser; const [shopSnapshot, inventorySnapshot] = await Promise.all([db.ref('/shop_items').once('value'), db.ref(`/user_inventory/${user.uid}`).once('value')]); if(!shopSnapshot.exists()) { shopContainer.innerHTML = "<p>Mağaza hazırda boşdur.</p>"; return; } let shopHTML = ''; const userInventory = inventorySnapshot.val() || {}; shopSnapshot.forEach(itemSnapshot => { const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const owned = !!userInventory[itemId]; shopHTML += `<div class="shop-item-card ${owned ? 'disabled' : ''}"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">💎 ${item.price_gems}</div><button class="btn-buy-item" onclick="buyItem('${itemId}', ${item.price_gems})" ${owned ? 'disabled' : ''}>${owned ? 'Alınıb' : 'Satın Al'}</button></div>`; }); shopContainer.innerHTML = shopHTML; }
-    async function loadMyItems() { const myItemsContainer = document.getElementById('my-items-container'); const user = auth.currentUser; const [inventorySnapshot, settingsSnapshot] = await Promise.all([db.ref(`/user_inventory/${user.uid}`).once('value'), db.ref(`/user_profile_settings/${user.uid}`).once('value')]); if(!inventorySnapshot.exists()){ myItemsContainer.innerHTML = "<p>Heç bir əşyanız yoxdur.</p>"; return; } let itemsHTML = ''; const userInventory = inventorySnapshot.val(); const equippedSettings = settingsSnapshot.val() || {}; const itemPromises = Object.keys(userInventory).map(itemId => db.ref(`/shop_items/${itemId}`).once('value')); const itemSnapshots = await Promise.all(itemPromises); itemSnapshots.forEach(itemSnapshot => { if(!itemSnapshot.exists()) return; const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const isEquipped = equippedSettings.equipped_frame === itemId || equippedSettings.equipped_bag_skin === itemId; itemsHTML += `<div class="shop-item-card"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">${item.type === 'frame' ? 'Çərçivə' : 'Görünüş'}</div><button class="btn-equip-item" onclick="equipItem('${itemId}', '${item.type}')" ${isEquipped ? 'disabled' : ''}>${isEquipped ? 'Tətbiq edilib' : 'Tətbiq Et'}</button></div>`; }); myItemsContainer.innerHTML = itemsHTML; }
+    async function loadShopItems() { const shopContainer = document.getElementById('shop-grid-container'); const user = auth.currentUser; if(!user) return; const [shopSnapshot, inventorySnapshot] = await Promise.all([db.ref('/shop_items').once('value'), db.ref(`/user_inventory/${user.uid}`).once('value')]); if(!shopSnapshot.exists()) { shopContainer.innerHTML = "<p>Mağaza hazırda boşdur.</p>"; return; } let shopHTML = ''; const userInventory = inventorySnapshot.val() || {}; shopSnapshot.forEach(itemSnapshot => { const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const owned = !!userInventory[itemId]; shopHTML += `<div class="shop-item-card ${owned ? 'disabled' : ''}"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">💎 ${item.price_gems}</div><button class="btn-buy-item" onclick="buyItem('${itemId}', ${item.price_gems})" ${owned ? 'disabled' : ''}>${owned ? 'Alınıb' : 'Satın Al'}</button></div>`; }); shopContainer.innerHTML = shopHTML; }
+    async function loadMyItems() { const myItemsContainer = document.getElementById('my-items-container'); const user = auth.currentUser; if(!user) return; const [inventorySnapshot, settingsSnapshot] = await Promise.all([db.ref(`/user_inventory/${user.uid}`).once('value'), db.ref(`/user_profile_settings/${user.uid}`).once('value')]); if(!inventorySnapshot.exists()){ myItemsContainer.innerHTML = "<p>Heç bir əşyanız yoxdur.</p>"; return; } let itemsHTML = ''; const userInventory = inventorySnapshot.val() || {}; const equippedSettings = settingsSnapshot.val() || {}; const itemPromises = Object.keys(userInventory).map(itemId => db.ref(`/shop_items/${itemId}`).once('value')); const itemSnapshots = await Promise.all(itemPromises); itemSnapshots.forEach(itemSnapshot => { if(!itemSnapshot.exists()) return; const itemId = itemSnapshot.key; const item = itemSnapshot.val(); const isEquipped = equippedSettings.equipped_frame === itemId || equippedSettings.equipped_bag_skin === itemId; itemsHTML += `<div class="shop-item-card"><div class="shop-item-preview">${item.icon}</div><div class="shop-item-name">${item.name}</div><div class="shop-item-price">${item.type === 'frame' ? 'Çərçivə' : 'Görünüş'}</div><button class="btn-equip-item" onclick="equipItem('${itemId}', '${item.type}')" ${isEquipped ? 'disabled' : ''}>${isEquipped ? 'Tətbiq edilib' : 'Tətbiq Et'}</button></div>`; }); myItemsContainer.innerHTML = itemsHTML; }
       // ================== BİRJA FUNKSİYALARI ==================
     let currentCoinData = { price: 0, name: 'Coin' };
     function initializeBirja() { const user = auth.currentUser; if (!user) { alert("Birjaya baxmaq üçün daxil olun."); switchPage('main-page'); return; } listeners['birjaSettings'] = db.ref('birja_settings').on('value', snapshot => { if (snapshot.exists()) { currentCoinData = snapshot.val(); document.getElementById('birjaCoinName').textContent = currentCoinData.name || 'Coin Birjası'; document.getElementById('birjaCoinPrice').textContent = `1 ${currentCoinData.name || 'Coin'} = ${parseFloat(currentCoinData.price || 0).toFixed(2)} AZN`; } }); loadTransactionHistory(user.uid); }
@@ -510,13 +475,16 @@ input:checked + .slider:before { transform: translateX(22px); }
     document.getElementById('buyCoinBtn').addEventListener('click', async () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); const amountToBuy = parseFloat(document.getElementById('buyAmount').value); if (isNaN(amountToBuy) || amountToBuy <= 0) return alert('Düzgün miqdar daxil edin.'); const cost = amountToBuy * currentCoinData.price; const balanceSnapshot = await db.ref(`/balances/${user.uid}/amount`).once('value'); const currentBalance = balanceSnapshot.val() || 0; if (cost > currentBalance) return alert('AZN balansınızda kifayət qədər vəsait yoxdur.'); const newTransactionKey = db.ref().child('birja_transactions').push().key; const transactionData = { type: 'buy', amountCoin: amountToBuy, amountAzn: cost, pricePerCoin: currentCoinData.price, timestamp: firebase.database.ServerValue.TIMESTAMP }; const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(-cost); updates[`/user_coins/${user.uid}/amount`] = firebase.database.ServerValue.increment(amountToBuy); updates[`/birja_transactions/${user.uid}/${newTransactionKey}`] = transactionData; db.ref().update(updates).then(() => { addXp(user.uid, Math.round(cost)); alert(`${amountToBuy.toFixed(2)} ${currentCoinData.name} uğurla alındı!`); document.getElementById('buyAmount').value = ''; calculateBirjaTotal('buy'); }).catch(error => alert('Xəta baş verdi: ' + error.message)); });
     document.getElementById('sellCoinBtn').addEventListener('click', async () => { const user = auth.currentUser; if (!user) return alert('Zəhmət olmasa, daxil olun.'); const amountToSell = parseFloat(document.getElementById('sellAmount').value); if (isNaN(amountToSell) || amountToSell <= 0) return alert('Düzgün miqdar daxil edin.'); const coinSnapshot = await db.ref(`/user_coins/${user.uid}/amount`).once('value'); const currentCoins = coinSnapshot.val() || 0; if (amountToSell > currentCoins) return alert(`${currentCoinData.name} balansınızda kifayət qədər vəsait yoxdur.`); const earnings = amountToSell * currentCoinData.price; const newTransactionKey = db.ref().child('birja_transactions').push().key; const transactionData = { type: 'sell', amountCoin: amountToSell, amountAzn: earnings, pricePerCoin: currentCoinData.price, timestamp: firebase.database.ServerValue.TIMESTAMP }; const updates = {}; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(earnings); updates[`/user_coins/${user.uid}/amount`] = firebase.database.ServerValue.increment(-amountToSell); updates[`/birja_transactions/${user.uid}/${newTransactionKey}`] = transactionData; db.ref().update(updates).then(() => { addXp(user.uid, Math.round(earnings)); alert(`${amountToSell.toFixed(2)} ${currentCoinData.name} uğurla satıldı!`); document.getElementById('sellAmount').value = ''; calculateBirjaTotal('sell'); }).catch(error => alert('Xəta baş verdi: ' + error.message)); });
 
-    // ================== SƏVİYYƏ, XP və ID SİSTEMİ ==================
+    // ================== SƏVİYYƏ, XP, ID, TAPŞIRIQLAR SİSTEMİ ==================
     const levelXpRequirements = [0, 250, 600, 1100, 1800, 2750, 4000, 5600, 7600, 10000, 15000, 22000, 30000];
     const levelRewards = { 5: {gems: 250, item: 'silver_frame'}, 10: {gems: 1000, item: 'gold_frame'} };
     async function addXp(uid, amount) { const levelRef = db.ref(`/user_levels/${uid}`); try { const snapshot = await levelRef.once('value'); let data = snapshot.val() || {level: 1, xp: 0}; data.xp += amount; let nextLevelXp = levelXpRequirements[data.level] || (10000 + (data.level - 9) * 5000) ; while(data.xp >= nextLevelXp && data.level < 50) { data.level += 1; levelUp(uid, data.level); nextLevelXp = levelXpRequirements[data.level] || (10000 + (data.level - 9) * 5000); if(!nextLevelXp) break; } await levelRef.set(data); } catch (e) { console.error("XP Error:", e); } }
     async function levelUp(uid, newLevel) { alert(`Təbriklər! Siz ${newLevel}-ci səviyyəyə çatdınız!`); let gemsToAdd = 50 * (newLevel-1); const reward = levelRewards[newLevel]; if(reward) { if(reward.gems) gemsToAdd += reward.gems; if(reward.item) await db.ref(`/user_inventory/${uid}/${reward.item}`).set(true); } await db.ref(`/user_gems/${uid}/amount`).set(firebase.database.ServerValue.increment(gemsToAdd)); }
     async function generateUniqueFriendlyId() { let isUnique = false; let friendlyId; while (!isUnique) { friendlyId = Math.floor(10000 + Math.random() * 90000); const snapshot = await db.ref('friendly_id_lookup/' + friendlyId).once('value'); if (!snapshot.exists()) { isUnique = true; } } return friendlyId; }
     function checkAndAssignFriendlyId(user) { const userRef = db.ref('users/' + user.uid); userRef.child('friendlyId').once('value', async snapshot => { if (!snapshot.exists()) { const newId = await generateUniqueFriendlyId(); const updates = {}; updates[`/users/${user.uid}/friendlyId`] = newId; updates[`/friendly_id_lookup/${newId}`] = user.uid; db.ref().update(updates); } }); }
+    async function checkDailyLogin(uid) { const today = new Date().toLocaleDateString(); const lastLoginRef = db.ref(`/users/${uid}/lastLogin`); const snapshot = await lastLoginRef.once('value'); if(snapshot.val() !== today) { await lastLoginRef.set(today); await addXp(uid, 10); console.log("Daily login XP awarded!"); } }
+    async function initializeTasksPage() { const tasksContainer = document.getElementById('tasks-container'); const user = auth.currentUser; if(!user) return; const [tasksSnapshot, submissionsSnapshot] = await Promise.all([db.ref('/tasks').once('value'), db.ref(`/task_submissions/${user.uid}`).once('value')]); if(!tasksSnapshot.exists()) { tasksContainer.innerHTML = "<p>Hazırda aktiv tapşırıq yoxdur.</p>"; return; } let tasksHTML = ''; const submissions = submissionsSnapshot.val() || {}; tasksSnapshot.forEach(taskSnapshot => { const taskId = taskSnapshot.key; const task = taskSnapshot.val(); const status = submissions[taskId]?.status || 'new'; let btnHTML; switch(status) { case 'pending': btnHTML = `<button class="task-button pending" disabled>Yoxlanılır</button>`; break; case 'completed': btnHTML = `<button class="task-button completed" disabled>Tamamlandı</button>`; break; default: btnHTML = `<button class="task-button do" onclick="doTask('${taskId}', '${task.link}')">Tapşırığı Et</button>`; } tasksHTML += `<div class="task-card"><div class="task-header"><span class="task-title">${task.title}</span><span class="task-reward">+${task.reward_amount} ${task.reward_type === 'gems' ? '💎' : 'XP'}</span></div><p class="task-description">${task.description}</p>${btnHTML}</div>`; }); tasksContainer.innerHTML = tasksHTML; }
+    function doTask(taskId, link) { if(confirm("Bu tapşırığı etmək üçün kənar səhifəyə yönləndiriləcəksiniz. Davam edilsin?")) { window.open(link, '_blank'); const user = auth.currentUser; db.ref(`/task_submissions/${user.uid}/${taskId}`).set({ status: 'pending', submittedAt: firebase.database.ServerValue.TIMESTAMP }); initializeTasksPage(); } }
       function animateCountUp(element, start, end, duration) { let startTime = null; const step = (timestamp) => { if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1); const current = start + progress * (end - start); element.textContent = current.toFixed(2); if (progress < 1) { window.requestAnimationFrame(step); } }; window.requestAnimationFrame(step); }
     function createCoinShower() { const coinCount = 10; const body = document.body; for (let i = 0; i < coinCount; i++) { const coin = document.createElement('span'); coin.className = 'coin'; coin.innerHTML = '🪙'; coin.style.left = `${Math.random() * 95}vw`; coin.style.animationDuration = `${Math.random() * 0.8 + 0.6}s`; coin.style.animationDelay = `${Math.random() * 0.4}s`; body.appendChild(coin); setTimeout(() => { coin.remove(); }, 2000); } }
     function cancelWithdrawal(withdrawalId, amount) { const parsedAmount = parseFloat(amount); if (!confirm(`${parsedAmount.toFixed(2)} AZN məbləğindəki çıxarış sorğusunu ləğv etmək istədiyinizə əminsiniz? Məbləğ balansınıza geri qaytarılacaq.`)) { return; } const user = auth.currentUser; if (!user) return alert("Xəta: İstifadəçi tapılmadı."); const withdrawalRef = db.ref(`withdrawals/${withdrawalId}`); withdrawalRef.once('value').then(snapshot => { const request = snapshot.val(); if (!request || request.status !== 'pending') { alert("Bu sorğu artıq emal edilib və ləğv edilə bilməz."); document.getElementById('notification-bell').click(); return; } const updates = {}; updates[`/withdrawals/${withdrawalId}/status`] = 'cancelled'; updates[`/balances/${user.uid}/amount`] = firebase.database.ServerValue.increment(parsedAmount); db.ref().update(updates).then(() => { alert("Sorğunuz ləğv edildi və məbləğ balansınıza geri qaytarıldı."); const modal = document.getElementById('notificationsModal'); if (modal.style.display === 'flex') { modal.style.display = 'none'; setTimeout(() => document.getElementById('notification-bell').click(), 200); } }).catch(error => { alert("Xəta baş verdi: " + error.message); }); }); }
@@ -542,19 +510,17 @@ input:checked + .slider:before { transform: translateX(22px); }
     function createFallingCoin(speed) { const coin = document.createElement('div'); coin.className = 'falling-coin'; coin.textContent = ['🪙', '💰', '💵', '💎'][Math.floor(Math.random() * 4)]; coin.style.left = `${Math.random() * 95}vw`; coin.style.animation = `fall-animation ${Math.random() * 1 + speed}s linear forwards`; coin.onclick = (event) => collectCoin(event.currentTarget); document.body.appendChild(coin); setTimeout(() => coin.remove(), (speed + 1.5) * 1000); }
     function collectCoin(coinElement) { const user = auth.currentUser; if (!user || !coinElement) return; coinElement.remove(); db.ref(`moneyRainEvent/participants/${user.uid}`).transaction((data) => { if (data === null) return { score: 1, displayName: user.displayName }; else return { ...data, score: (data.score || 0) + 1 }; }); }
     function showLeaderboardResult(leaderboardData) { if (!leaderboardData) return; const modal = document.getElementById('leaderboardResultModal'); const listContainer = document.getElementById('leaderboard-result-list'); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); let leaderboardHtml = '<ul>'; if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; modal.style.display = 'flex'; }
-    function switchPage(pageId) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); document.getElementById(pageId).classList.add('active'); const isMain = pageId === 'main-page'; document.querySelector('.action-buttons').style.display = isMain ? 'block' : 'none'; switch (pageId) { case 'main-page': document.getElementById('homeBtn').classList.add('active'); break; case 'leaderboard-page': document.getElementById('leaderboardBtn').classList.add('active'); document.getElementById('leaderboard-tab-rain').click(); break; case 'stats-page': document.getElementById('statsBtn').classList.add('active'); fetchStatistics(); break; case 'birja-page': document.getElementById('birjaBtn').classList.add('active'); initializeBirja(); break; case 'shop-page': document.getElementById('shopBtn').classList.add('active'); initializeShop(); break; case 'settings-page': document.getElementById('homeBtn').classList.remove('active'); initializeSettingsPage(); break; case 'help-page': document.getElementById('homeBtn').classList.remove('active'); document.getElementById('shopBtn').classList.remove('active'); break; } }
+    function switchPage(pageId) { document.querySelectorAll('.page').forEach(page => page.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active')); document.getElementById(pageId).classList.add('active'); const isMain = pageId === 'main-page'; document.querySelector('.action-buttons').style.display = isMain ? 'block' : 'none'; document.getElementById('notification-bell').style.display = isMain ? 'block' : 'none'; document.getElementById('status-icon').style.display = isMain ? 'block' : 'none'; switch (pageId) { case 'main-page': document.getElementById('homeBtn').classList.add('active'); break; case 'leaderboard-page': document.getElementById('leaderboardBtn').classList.add('active'); document.getElementById('leaderboard-tab-rain').click(); break; case 'tasks-page': document.getElementById('tasksBtn').classList.add('active'); initializeTasksPage(); break; case 'birja-page': document.getElementById('birjaBtn').classList.add('active'); initializeBirja(); break; case 'shop-page': document.getElementById('shopBtn').classList.add('active'); initializeShop(); break; case 'settings-page': document.getElementById('homeBtn').classList.remove('active'); initializeSettingsPage(); break; case 'help-page': document.getElementById('homeBtn').classList.remove('active'); break; } }
     document.getElementById('homeBtn').addEventListener('click', () => switchPage('main-page'));
     document.getElementById('leaderboardBtn').addEventListener('click', () => switchPage('leaderboard-page'));
-    document.getElementById('statsBtn').addEventListener('click', () => switchPage('stats-page'));
+    document.getElementById('tasksBtn').addEventListener('click', () => switchPage('tasks-page'));
     document.getElementById('birjaBtn').addEventListener('click', () => switchPage('birja-page'));
     document.getElementById('shopBtn').addEventListener('click', () => switchPage('shop-page'));
     document.getElementById('settingsBtn').addEventListener('click', () => switchPage('settings-page'));
     function fetchLeaderboard() { const listContainer = document.getElementById('leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; db.ref('moneyRainEvent/leaderboard').once('value', (snapshot) => { let leaderboardHtml = '<ul>'; if(snapshot.exists()) { const leaderboardData = snapshot.val(); const sortedPlayers = Object.values(leaderboardData).sort((a, b) => b.reward - a.reward); if (sortedPlayers.length > 0) { sortedPlayers.slice(0, 20).forEach((player, index) => { leaderboardHtml += `<li>#${index + 1} <b>${player.displayName}</b> - ${player.reward.toFixed(2)} AZN qazandı!</li>`; }); } else { leaderboardHtml += '<li>Heç kim iştirak etmədi.</li>'; } } else { leaderboardHtml += "<li>Hələ heç bir nəticə yoxdur.</li>"; } leaderboardHtml += '</ul>'; listContainer.innerHTML = leaderboardHtml; }); }
-    function fetchLevelLeaderboard() { const listContainer = document.getElementById('level-leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; db.ref('user_levels').orderByChild('level').limitToLast(50).once('value', snapshot => { if (!snapshot.exists()) { listContainer.innerHTML = "<ul><li>Sıralama üçün kifayət qədər istifadəçi yoxdur.</li></ul>"; return; } let users = []; snapshot.forEach(child => { users.push({ uid: child.key, ...child.val() }); }); users.sort((a, b) => { if (b.level === a.level) { return b.xp - a.xp; } return b.level - a.level; }); const userPromises = users.map(user => db.ref(`users/${user.uid}/displayName`).once('value')); Promise.all(userPromises).then(names => { let listHTML = '<ul>'; users.forEach((user, index) => { const displayName = names[index].val() || "Naməlum"; listHTML += `<li>#${index + 1} <b>${displayName}</b> <span>Level ${user.level} (${user.xp} XP)</span></li>`; }); listHTML += '</ul>'; listContainer.innerHTML = listHTML; }); }); }
+    async function fetchLevelLeaderboard() { const listContainer = document.getElementById('level-leaderboard-list'); listContainer.innerHTML = "<ul><li>Yüklənir...</li></ul>"; const levelsSnapshot = await db.ref('user_levels').orderByChild('level').limitToLast(50).once('value'); if (!levelsSnapshot.exists()) { listContainer.innerHTML = "<ul><li>Sıralama üçün kifayət qədər istifadəçi yoxdur.</li></ul>"; return; } let users = []; levelsSnapshot.forEach(child => { users.push({ uid: child.key, ...child.val() }); }); users.sort((a, b) => b.level === a.level ? b.xp - a.xp : b.level - a.level); const userInfoPromises = users.map(user => Promise.all([ db.ref(`users/${user.uid}`).once('value'), db.ref(`/user_profile_settings/${user.uid}/equipped_frame`).once('value') ]) ); const usersInfo = await Promise.all(userInfoPromises); let listHTML = '<ul>'; users.forEach((user, index) => { const userData = usersInfo[index][0].val() || {}; const frameId = usersInfo[index][1].val(); let frameClass = ''; if (frameId === 'gold_frame') frameClass = 'frame-gold'; if (frameId === 'silver_frame') frameClass = 'frame-silver'; const photoURL = userData.photoURL || 'https://i.imgur.com/3YQ5h0Q.png'; const displayName = userData.displayName || "Naməlum"; listHTML += `<li><div class="leaderboard-item-user"><img src="${photoURL}" class="leaderboard-avatar ${frameClass}"><span><b>#${index + 1}</b> ${displayName}</span></div><span>Level ${user.level} (${user.xp} XP)</span></li>`; }); listHTML += '</ul>'; listContainer.innerHTML = listHTML; }
     document.getElementById('leaderboard-tab-rain').addEventListener('click', function() { this.classList.add('active'); document.getElementById('leaderboard-tab-level').classList.remove('active'); document.getElementById('leaderboard-rain-content').style.display = 'block'; document.getElementById('leaderboard-level-content').style.display = 'none'; fetchLeaderboard(); });
     document.getElementById('leaderboard-tab-level').addEventListener('click', function() { this.classList.add('active'); document.getElementById('leaderboard-tab-rain').classList.remove('active'); document.getElementById('leaderboard-rain-content').style.display = 'none'; document.getElementById('leaderboard-level-content').style.display = 'block'; fetchLevelLeaderboard(); });
-    function maskDisplayName(name) { if (!name || name.length < 3) return "***"; const start = name.slice(0, 2); const end = name.slice(-1); const middle = '*'.repeat(Math.max(3, name.length - 3)); return `${start}${middle}${end}`; }
-    function fetchStatistics() { const statsList = document.getElementById('stats-list'); statsList.innerHTML = "<ul><li>Yüklənir...</li></ul>"; const balancesRef = db.ref('balances').orderByChild('amount').limitToLast(25); const usersRef = db.ref('users'); Promise.all([balancesRef.once('value'), usersRef.once('value')]).then(([balancesSnapshot, usersSnapshot]) => { if (!balancesSnapshot.exists()) { statsList.innerHTML = "<ul><li>Statistika məlumatı tapılmadı.</li></ul>"; return; } const allUsers = usersSnapshot.val() || {}; let statsData = []; balancesSnapshot.forEach(childSnapshot => { const uid = childSnapshot.key; const balanceData = childSnapshot.val(); const userData = allUsers[uid]; if (userData && balanceData.amount > 0) { statsData.push({ displayName: userData.displayName || "Naməlum", amount: balanceData.amount }); } }); statsData.sort((a, b) => b.amount - a.amount); if (statsData.length === 0) { statsList.innerHTML = "<ul><li>Statistika məlumatı tapılmadı.</li></ul>"; return; } let statsHtml = '<ul>'; statsData.forEach((player, index) => { const maskedName = maskDisplayName(player.displayName); statsHtml += `<li>#${index + 1} <b>${maskedName}</b> <span>${player.amount.toFixed(2)} AZN</span></li>`; }); statsHtml += '</ul>'; statsList.innerHTML = statsHtml; }).catch(error => { console.error("Statistika yüklənərkən xəta:", error); statsList.innerHTML = "<ul><li>Məlumatları yükləmək mümkün olmadı.</li></ul>"; }); }
     const accordions = document.getElementsByClassName("accordion");
     for (let i = 0; i < accordions.length; i++) { accordions[i].addEventListener("click", function() { this.classList.toggle("active"); const panel = this.nextElementSibling; if (panel.style.maxHeight) { panel.style.maxHeight = null; } else { panel.style.maxHeight = panel.scrollHeight + "px"; } }); }
     function attachAllListeners(uid) { detachAllListeners(); let lastKnownBalance = 0; listeners['balance'] = db.ref('balances/' + uid).on('value', snapshot => { const newBalance = snapshot.val()?.amount || 0; const balanceElement = document.getElementById('balance'); document.getElementById('header-azn-balance').querySelector('span').textContent = newBalance.toFixed(2); document.getElementById('birjaAznBalance').textContent = `${newBalance.toFixed(2)} AZN`; if (newBalance > lastKnownBalance && lastKnownBalance !== 0) { animateCountUp(balanceElement, lastKnownBalance, newBalance, 1200); } else { balanceElement.textContent = newBalance.toFixed(2); } lastKnownBalance = newBalance; }); listeners['coins'] = db.ref('user_coins/' + uid).on('value', snapshot => { const coinAmount = snapshot.val()?.amount || 0; document.getElementById('header-coin-balance').querySelector('span').textContent = coinAmount.toFixed(2); document.getElementById('birjaUserCoinBalance').textContent = `${coinAmount.toFixed(2)} ${currentCoinData.name || 'Coin'}`; }); listeners['gems'] = db.ref('user_gems/' + uid).on('value', snapshot => { document.getElementById('header-gem-balance').querySelector('span').textContent = snapshot.val()?.amount || 0; }); listeners['level'] = db.ref('user_levels/' + uid).on('value', snapshot => { const levelData = snapshot.val() || {level: 1, xp: 0}; const nextLevelXp = levelXpRequirements[levelData.level] || (10000 + (levelData.level - 9) * 5000); const prevLevelXp = levelXpRequirements[levelData.level-1] || 0; const xpInLevel = nextLevelXp - prevLevelXp; const currentXpInLevel = levelData.xp - prevLevelXp; const progress = Math.min(100, (currentXpInLevel / xpInLevel) * 100); document.getElementById('level-start-text').textContent = `Level ${levelData.level}`; document.getElementById('level-xp-text').textContent = `${levelData.xp} / ${nextLevelXp} XP`; document.getElementById('level-progress-bar').style.width = `${progress}%`; }); listeners['equippedItems'] = db.ref(`/user_profile_settings/${uid}`).on('value', snapshot => { const settings = snapshot.val() || {}; const bagIcon = document.getElementById('main-bag-icon'); if(settings.equipped_bag_skin) { db.ref(`/shop_items/${settings.equipped_bag_skin}/icon`).once('value', icon => { if(icon.exists()) bagIcon.textContent = icon.val(); }); } else { bagIcon.textContent = '💰'; } }); }
